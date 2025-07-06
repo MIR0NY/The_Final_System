@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+
+
+model Student {
+  id            String @id
+  name          String
+  class         Int
+  section       String
+  roll          Int
+  address       String?
+  guardian      String?
+  contact       String?
+  tuitionFee    Float
+  vehicleNo     String?
+  vehicleFee    Float?
+  stationName   String?
+  dateOfBirth   String?
+  bloodGroup    String?
+  status        String  @default("active")
+  admissionMonth String?
+
+  payments Payment[] // Relationship to Payment model
+
+  @@unique([class, section, roll])
+  @@map("students")
+}
+
+model Payment {
+  id          String   @id @default(uuid()) // Unique ID for each payment
+  receiptNo   String
+  year        Int
+  date        String   // YYYY-MM-DD
+  studentId   String   // Foreign key to Student.id
+  feeType     String
+  month       String   // Can store single month or comma-separated for multiple
+  amount      Float
+  description String?
+
+  student Student @relation(fields: [studentId], references: [id]) // Define the relation
+
+  @@map("payments")
+}
+
+// You will add other models (Expense, Teacher, User) in later steps
+// We will add other models (Expense, Teacher, User) in later steps
