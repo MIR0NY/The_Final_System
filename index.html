@@ -1,0 +1,2313 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Management App</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease; /* Smooth transition for dark mode */
+        }
+        /* Light mode default */
+        html.light body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #1f2937; /* Default text color */
+        }
+        html.light .bg-white { background-color: #ffffff; }
+        html.light .bg-gray-50 { background-color: #f9fafb; }
+        html.light .bg-gray-100 { background-color: #f3f4f6; }
+        html.light .border-gray-200 { border-color: #e5e7eb; }
+        html.light .border-gray-300 { border-color: #d1d5db; }
+        html.light .text-gray-700 { color: #374151; }
+        html.light .text-gray-800 { color: #1f2937; }
+        html.light .text-gray-900 { color: #111827; }
+        html.light .text-gray-500 { color: #6b7280; }
+        html.light .hover\:bg-gray-50:hover { background-color: #f9fafb; }
+
+
+        /* Dark mode styles */
+        html.dark body {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: #e5e7eb; /* Light text color for dark mode */
+        }
+        html.dark .bg-white, html.dark .kpi-card { background-color: #1f2937; }
+        html.dark .bg-gray-50 { background-color: #374151; }
+        html.dark .bg-gray-100 { background-color: #1f2937; }
+        html.dark .border-gray-200 { border-color: #4b5563; }
+        html.dark .border-gray-300 { border-color: #4b5563; }
+        html.dark .text-gray-700 { color: #d1d5db; }
+        html.dark .text-gray-800 { color: #f3f4f6; }
+        html.dark .text-gray-900 { color: #f9fafb; }
+        html.dark .text-gray-500 { color: #9ca3af; }
+        html.dark .hover\:bg-gray-50:hover { background-color: #374151; }
+        html.dark input, html.dark select, html.dark textarea {
+            background-color: #374151;
+            color: #f9fafb;
+            border-color: #4b5563;
+        }
+        html.dark input:focus, html.dark select:focus, html.dark textarea:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+        }
+        html.dark .bg-indigo-50 { background-color: #4338ca; }
+        html.dark .border-indigo-200 { border-color: #6366f1; }
+        html.dark .bg-gray-200 { background-color: #4b5563; }
+        html.dark .text-gray-800 { color: #f3f4f6; }
+        html.dark .text-gray-700 { color: #d1d5db; }
+
+        .sidebar-btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 20; /* Ensure button content is above pseudo-element */
+        }
+        /* Active state for sidebar buttons, specific to light mode */
+        html.light .sidebar-btn.active {
+            background-color: #4f46e5;
+            color: white; /* Ensure white text in light mode */
+            font-weight: bold; /* Make font bold in light mode */
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            transform: translateY(-2px);
+        }
+        /* Active state for sidebar buttons, specific to dark mode */
+        html.dark .sidebar-btn.active {
+            background-color: #4f46e5;
+            color: white; /* Ensure white text in dark mode */
+            font-weight: bold; /* Make font bold in dark mode */
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            transform: translateY(-2px);
+        }
+
+
+        .sidebar-btn:hover:not(.active) {
+            background-color: #e0e7ff;
+            color: #4f46e5;
+        }
+        html.dark .sidebar-btn:hover:not(.active) {
+            background-color: #374151;
+            color: #a78bfa;
+        }
+
+        .sidebar-btn:hover:not(.active)::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(79, 70, 229, 0.1);
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+        html.dark .sidebar-btn:hover:not(.active)::before {
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .sidebar-btn.active::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background-color: #8b5cf6; /* A slightly different shade for active indicator */
+            border-radius: 0 5px 5px 0;
+        }
+        .table-responsive {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        /* Modal styles */
+        .modal {
+            transition: opacity 0.3s ease;
+        }
+        select[multiple] {
+            height: 120px;
+        }
+        .table-cell-nowrap {
+            white-space: nowrap;
+        }
+        .kpi-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #e2e8f0; /* Light border for definition */
+        }
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background-image: linear-gradient(to right, #6366f1 0%, #8b5cf6 100%);
+            transition: all 0.3s ease;
+            background-size: 200% auto;
+        }
+        .btn-primary:hover {
+            background-position: right center;
+            box-shadow: 0 8px 15px rgba(139, 92, 246, 0.4);
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background-image: linear-gradient(to right, #ef4444 0%, #f472b6 100%);
+            transition: all 0.3s ease;
+            background-size: 200% auto;
+        }
+        .btn-secondary:hover {
+            background-position: right center;
+            box-shadow: 0 8px 15px rgba(244, 114, 182, 0.4);
+            transform: translateY(-1px);
+        }
+        .btn-tertiary {
+             background-image: linear-gradient(to right, #6b7280 0%, #9ca3af 100%);
+            transition: all 0.3s ease;
+            background-size: 200% auto;
+        }
+        .btn-tertiary:hover {
+            background-position: right center;
+            box-shadow: 0 8px 15px rgba(156, 163, 175, 0.4);
+            transform: translateY(-1px);
+        }
+        input, select, textarea {
+            border-radius: 0.5rem;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #d1d5db;
+            transition: all 0.2s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            outline: none;
+        }
+        /* Print styles for salary table */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #page-teacher-salary-print, #page-teacher-salary-print * {
+                visibility: visible;
+            }
+            #page-teacher-salary-print {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 1rem;
+                box-shadow: none; /* Remove shadows for print */
+                background-color: white; /* Ensure white background for print */
+            }
+            #page-teacher-salary-print table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            #page-teacher-salary-print th, #page-teacher-salary-print td {
+                border: 1px solid #ccc;
+                padding: 8px;
+                text-align: left;
+            }
+            #page-teacher-salary-print thead {
+                background-color: #f2f2f2;
+            }
+        }
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <i class="fas fa-spinner fa-spin mr-3"></i> Loading...
+    </div>
+
+    <div class="flex h-screen overflow-hidden" id="app-container">
+        <!-- Login Page -->
+        <section id="page-login" class="flex flex-col items-center justify-center h-full w-full">
+            <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200">
+                <h2 class="text-3xl font-bold text-indigo-600 mb-6 text-center">School Login</h2>
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label for="login-email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="login-email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" required>
+                    </div>
+                    <div>
+                        <label for="login-password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" id="login-password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" required>
+                    </div>
+                    <div id="login-message" class="text-red-600 text-sm hidden"></div>
+                    <button type="submit" class="btn-primary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 w-full">Login</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Main App Content (hidden until login) -->
+        <div id="main-app-content" class="flex flex-1 hidden">
+            <!-- Sidebar -->
+            <aside id="sidebar" class="w-64 bg-white shadow-lg flex flex-col p-4 fixed lg:relative inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-30">
+                <h1 class="text-2xl font-bold text-indigo-600 mb-8 text-center">School Admin</h1>
+                <nav class="flex flex-col space-y-2 flex-grow">
+                    <button id="btn-payments" class="sidebar-btn flex items-center p-3 rounded-lg font-medium text-gray-700">
+                        <i class="fas fa-money-bill-wave w-6 text-center"></i>
+                        <span class="ml-3">Payments</span>
+                    </button>
+                     <button id="btn-expenses" class="sidebar-btn flex items-center p-3 rounded-lg font-medium text-gray-700">
+                        <i class="fas fa-receipt w-6 text-center"></i>
+                        <span class="ml-3">Expenses</span>
+                    </button>
+                    <button id="btn-students" class="sidebar-btn flex items-center p-3 rounded-lg font-medium text-gray-700">
+                        <i class="fas fa-user-graduate w-6 text-center"></i>
+                        <span class="ml-3">Student Details</span>
+                    </button>
+                     <button id="btn-teachers" class="sidebar-btn flex items-center p-3 rounded-lg font-medium text-gray-700">
+                        <i class="fas fa-chalkboard-teacher w-6 text-center"></i>
+                        <span class="ml-3">Teacher's Info</span>
+                    </button>
+                    <button id="btn-teacher-salary" class="sidebar-btn flex items-center p-3 rounded-lg font-medium text-gray-700">
+                        <i class="fas fa-money-check-alt w-6 text-center"></i>
+                        <span class="ml-3">Teacher Salary</span>
+                    </button>
+                     <button id="btn-vehicles" class="sidebar-btn flex items-center p-3 rounded-lg font-medium text-gray-700">
+                        <i class="fas fa-bus w-6 text-center"></i>
+                        <span class="ml-3">Vehicle Details</span>
+                    </button>
+                    <button id="btn-dashboard" class="sidebar-btn flex items-center p-3 rounded-lg font-medium text-gray-700">
+                        <i class="fas fa-chart-pie w-6 text-center"></i>
+                        <span class="ml-3">Dashboard</span>
+                    </button>
+                </nav>
+                <div class="mt-auto pt-4 border-t border-gray-200">
+                    <button id="dark-mode-toggle" class="sidebar-btn flex items-center p-3 rounded-lg font-medium text-gray-700 w-full mb-2">
+                        <i class="fas fa-moon w-6 text-center" id="dark-mode-icon"></i>
+                        <span class="ml-3" id="dark-mode-text">Dark Mode</span>
+                    </button>
+                     <button id="logout-btn" class="sidebar-btn flex items-center p-3 rounded-lg font-medium text-red-600 hover:bg-red-100 hover:text-red-700 w-full">
+                        <i class="fas fa-sign-out-alt w-6 text-center"></i>
+                        <span class="ml-3">Logout (<span id="current-user-email"></span>)</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 flex flex-col overflow-y-auto">
+                <div class="lg:hidden p-4 flex justify-between items-center bg-white shadow-md">
+                    <h1 class="text-xl font-bold text-indigo-600">School Admin</h1>
+                     <button id="menu-toggle" class="text-gray-700 focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+                <div id="content" class="p-4 md:p-8">
+                    <!-- Page 1: Payments -->
+                    <section id="page-payments" class="space-y-6">
+                        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                            <h2 class="text-3xl font-bold text-gray-800">Fee Payments</h2>
+                            <button id="add-payment-btn" class="btn-primary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 flex items-center w-full md:w-auto">
+                                <i class="fas fa-plus mr-2"></i> Add Payment
+                            </button>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                               <input type="text" id="filter-payment-id" placeholder="Filter by Student ID or Class ID (e.g., CLASS-6-GOLAP)..." class="w-full p-2 border border-gray-300 rounded-lg col-span-1 md:col-span-3">
+                               <button id="clear-payment-filters-btn" class="btn-tertiary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-gray-700 transition duration-300">
+                                    Clear Filter
+                                </button>
+                            </div>
+                             <div class="table-responsive">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Receipt No</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paid For (ID)</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fee Type</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider edit-action-header">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="payments-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Page 2: Expenses -->
+                    <section id="page-expenses" class="hidden space-y-6">
+                        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                            <h2 class="text-3xl font-bold text-gray-800">School Expenses</h2>
+                            <button id="add-expense-btn" class="btn-secondary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-rose-700 transition duration-300 flex items-center w-full md:w-auto">
+                                <i class="fas fa-plus mr-2"></i> Add Expense
+                            </button>
+                        </div>
+                         <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                               <input type="text" id="filter-expense-text" placeholder="Search by type or description..." class="w-full p-2 border border-gray-300 rounded-lg col-span-1 md:col-span-3">
+                               <button id="clear-expense-filters-btn" class="btn-tertiary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-gray-700 transition duration-300">
+                                    Clear Filter
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Receipt No</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expense Type</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider edit-action-header">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="expenses-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Page 3: Student Details -->
+                    <section id="page-students" class="space-y-6">
+                         <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                            <h2 class="text-3xl font-bold text-gray-800">Student Details</h2>
+                            <button id="add-student-btn" class="btn-primary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 flex items-center w-full md:w-auto">
+                                <i class="fas fa-user-plus mr-2"></i> Add Student
+                            </button>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                                <select id="filter-class" class="w-full p-2 border border-gray-300 rounded-lg"><option value="">All Classes</option></select>
+                                <select id="filter-section" class="w-full p-2 border border-gray-300 rounded-lg"><option value="">All Sections</option></select>
+                                <button id="clear-student-filters-btn" class="btn-tertiary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-gray-700 transition duration-300 col-span-1 md:col-start-4">
+                                    Clear Filters
+                                </button>
+                            </div>
+                             <!-- Desktop Table View -->
+                             <div class="table-responsive hidden lg:block">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student ID</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class-Sec</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roll</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th> <!-- New -->
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Blood Group</th> <!-- New -->
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admission Month</th> <!-- New -->
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Months</th> <!-- New -->
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tuition Last Paid</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Tuition Paid</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle Last Paid</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Vehicle Paid</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Station Name</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Half Yearly</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Yearly Exam</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider edit-action-header">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="students-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+                                </table>
+                            </div>
+                            <!-- Mobile Card View -->
+                            <div id="students-card-view" class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:hidden">
+                                <!-- Student cards will be injected here -->
+                            </div>
+                        </div>
+                    </section>
+                    
+                     <!-- Page 4: Teacher's Info -->
+                    <section id="page-teachers" class="hidden space-y-6">
+                         <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                            <h2 class="text-3xl font-bold text-gray-800">Teacher's Information</h2>
+                            <button id="add-teacher-btn" class="btn-primary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 flex items-center w-full md:w-auto">
+                                <i class="fas fa-user-plus mr-2"></i> Add Teacher
+                            </button>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                            <!-- Desktop Table View -->
+                             <div class="table-responsive hidden lg:block">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee Type</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salary</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joining Date</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider edit-action-header">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="teachers-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+                                </table>
+                            </div>
+                            <!-- Mobile Card View -->
+                            <div id="teachers-card-view" class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:hidden">
+                                <!-- Teacher cards will be injected here -->
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Page 7: Teacher Salary for Print -->
+                    <section id="page-teacher-salary" class="hidden space-y-6">
+                        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                            <h2 class="text-3xl font-bold text-gray-800">Teacher Monthly Salary Sheet</h2>
+                            <button id="print-salary-btn" class="btn-primary text-white font-bold py-2 px-4 rounded-lg shadow-md flex items-center w-full md:w-auto">
+                                <i class="fas fa-print mr-2"></i> Print Salary Sheet
+                            </button>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <label for="salary-month-filter" class="block text-sm font-medium text-gray-700">Select Month</label>
+                                    <select id="salary-month-filter" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"></select>
+                                </div>
+                                <div>
+                                    <label for="salary-year-filter" class="block text-sm font-medium text-gray-700">Select Year</label>
+                                    <input type="number" id="salary-year-filter" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3" value="2024">
+                                </div>
+                            </div>
+                            <div id="page-teacher-salary-print" class="p-4 bg-white rounded-lg">
+                                <h2 class="text-2xl font-bold text-center mb-2">Sonargaon Quality School and College</h2>
+                                <h3 class="text-xl font-bold text-center mb-4">Teacher Monthly Salary Sheet - <span id="salary-sheet-month-year"></span></h3>
+                                <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-300">SL No.</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-300">Employee Type</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-300">Name</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-300">Subject</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-300">Salary</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-300">Signature</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="teacher-salary-table-body" class="bg-white divide-y divide-gray-200">
+                                        <!-- Teacher salaries will be injected here -->
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="bg-gray-50 font-bold">
+                                            <td colspan="4" class="px-4 py-2 text-right border border-gray-300">Total Salary:</td>
+                                            <td id="total-salary-amount" class="px-4 py-2 border border-gray-300">$0</td>
+                                            <td class="px-4 py-2 border border-gray-300"></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                                <div class="mt-12 grid grid-cols-3 gap-8 text-center text-sm">
+                                    <div class="flex flex-col items-center">
+                                        <p class="mt-16 border-t border-gray-400 w-48 pt-2">Head Teacher Signature</p>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <p class="mt-16 border-t border-gray-400 w-48 pt-2">Secretary Signature</p>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <p class="mt-16 border-t border-gray-400 w-48 pt-2">Chairman Signature</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Page 5: Vehicle Details -->
+                    <section id="page-vehicles" class="hidden space-y-6">
+                         <h2 class="text-3xl font-bold text-gray-800">Vehicle Details</h2>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                               <input type="text" id="filter-vehicle-no" placeholder="Filter by Vehicle No..." class="w-full p-2 border border-gray-300 rounded-lg col-span-1 md:col-span-3">
+                               <button id="clear-vehicle-filters-btn" class="btn-tertiary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-gray-700 transition duration-300">
+                                    Clear Filter
+                                </button>
+                            </div>
+                             <div class="table-responsive">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle No</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student ID</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class-Sec</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roll</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle Fee</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Station Name</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Paid Month</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Paid</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vehicles-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Page 6: Dashboard -->
+                    <section id="page-dashboard" class="hidden space-y-6">
+                        <h2 class="text-3xl font-bold text-gray-800">Financial Dashboard</h2>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+                                <select id="dash-filter-type" class="w-full p-2 border border-gray-300 rounded-lg">
+                                    <option value="Income">Income Report</option>
+                                    <option value="Expense">Expense Report</option>
+                                </select>
+                                <select id="dash-filter-year" class="w-full p-2 border border-gray-300 rounded-lg"><option value="">All Years</option></select>
+                                <select id="dash-filter-month" class="w-full p-2 border border-gray-300 rounded-lg"><option value="">All Months</option></select>
+                                <select id="dash-filter-class" class="w-full p-2 border border-gray-300 rounded-lg"><option value="">All Classes</option></select>
+                                <select id="dash-filter-section" class="w-full p-2 border border-gray-300 rounded-lg"><option value="">All Sections</option></select>
+                            </div>
+                             <button id="clear-dash-filters-btn" class="w-full btn-tertiary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-gray-700 transition duration-300">
+                                    Clear All Filters
+                                </button>
+                        </div>
+                         <div id="dashboard-kpis" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            <!-- KPI Cards will be injected here -->
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit Payment -->
+    <div id="payment-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-40 hidden opacity-0">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl p-8 overflow-y-auto max-h-screen">
+            <h2 id="modal-title" class="text-2xl font-bold text-gray-800 mb-6">Add New Payment</h2>
+            <form id="payment-form">
+                <input type="hidden" id="edit-row-index">
+                <div>
+                    <label for="fee-type" class="block text-sm font-medium text-gray-700">Fee Type</label>
+                    <select id="fee-type" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"></select>
+                </div>
+                
+                <div id="student-payment-fields" class="mt-4 space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="student-id" class="block text-sm font-medium text-gray-700">Student ID</label>
+                            <input type="text" id="student-id" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                        </div>
+                         <div>
+                            <label for="receipt-no-student" class="block text-sm font-medium text-gray-700">Receipt No.</label>
+                            <input type="text" id="receipt-no-student" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                        </div>
+                    </div>
+                    <div id="student-info-box" class="p-3 bg-indigo-50 border border-indigo-200 rounded-lg hidden"></div>
+                </div>
+
+                <div id="class-payment-fields" class="mt-4 space-y-4 hidden">
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                             <label for="payment-class" class="block text-sm font-medium text-gray-700">Class</label>
+                             <select id="payment-class" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></select>
+                        </div>
+                        <div>
+                            <label for="payment-section" class="block text-sm font-medium text-gray-700">Section</label>
+                            <select id="payment-section" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></select>
+                        </div>
+                         <div>
+                            <label for="receipt-no-class" class="block text-sm font-medium text-gray-700">Receipt No.</label>
+                            <input type="text" id="receipt-no-class" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                        </div>
+                     </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <label for="payment-date" class="block text-sm font-medium text-gray-700">Payment Date</label>
+                        <input type="date" id="payment-date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3" required>
+                    </div>
+                     <div>
+                        <label for="payment-year" class="block text-sm font-medium text-gray-700">Payment Year</label>
+                        <input type="number" id="payment-year" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3" required>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="month" class="block text-sm font-medium text-gray-700">Month(s) <span class="text-xs text-gray-500">(Hold Ctrl/Cmd to select multiple)</span></label>
+                         <select id="month" multiple class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"></select>
+                    </div>
+                    <div>
+                        <label for="amount" id="amount-label" class="block text-sm font-medium text-gray-700">Amount</label>
+                        <input type="number" id="amount" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3" required>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="payment-description" class="block text-sm font-medium text-gray-700">Payment Description</label>
+                        <textarea id="payment-description" rows="2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"></textarea>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-end space-x-4">
+                    <button type="button" id="payment-modal-close-btn" class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300">Cancel</button>
+                    <button type="submit" class="btn-primary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit Expense -->
+    <div id="expense-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-40 hidden opacity-0">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-8">
+            <h2 id="expense-modal-title" class="text-2xl font-bold text-gray-800 mb-6">Add New Expense</h2>
+            <form id="expense-form">
+                <input type="hidden" id="expense-edit-id">
+                <div class="space-y-4">
+                    <div>
+                        <label for="expense-receipt-no" class="block text-sm font-medium text-gray-700">Receipt No.</label>
+                        <input type="text" id="expense-receipt-no" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                    </div>
+                     <div>
+                        <label for="expense-date" class="block text-sm font-medium text-gray-700">Expense Date</label>
+                        <input type="date" id="expense-date" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                    </div>
+                    <div>
+                        <label for="expense-type" class="block text-sm font-medium text-gray-700">Expense Type</label>
+                        <select id="expense-type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required></select>
+                    </div>
+                     <div>
+                        <label for="expense-amount" class="block text-sm font-medium text-gray-700">Amount</label>
+                        <input type="number" id="expense-amount" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                    </div>
+                    <div>
+                        <label for="expense-description" class="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea id="expense-description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-end space-x-4">
+                    <button type="button" id="expense-modal-close-btn" class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300">Cancel</button>
+                    <button type="submit" class="btn-secondary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-rose-700">Submit Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal for Add/Edit Student -->
+    <div id="student-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-40 hidden opacity-0">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl p-8 overflow-y-auto max-h-screen">
+            <h2 id="student-modal-title" class="text-2xl font-bold text-gray-800 mb-6">Add New Student</h2>
+            <form id="student-form">
+                <input type="hidden" id="student-edit-id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="new-student-id" class="block text-sm font-medium text-gray-700">Student ID</label>
+                        <input type="text" id="new-student-id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                    </div>
+                     <div>
+                        <label for="new-student-roll" class="block text-sm font-medium text-gray-700">Roll No.</label>
+                        <input type="number" id="new-student-roll" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="new-student-name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                        <input type="text" id="new-student-name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                    </div>
+                     <div>
+                        <label for="new-student-class" class="block text-sm font-medium text-gray-700">Class</label>
+                        <select id="new-student-class" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required></select>
+                    </div>
+                    <div>
+                        <label for="new-student-section" class="block text-sm font-medium text-gray-700">Section</label>
+                        <select id="new-student-section" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required></select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="new-student-address" class="block text-sm font-medium text-gray-700">Address</label>
+                        <textarea id="new-student-address" rows="2" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
+                    </div>
+                    <div>
+                        <label for="new-student-guardian" class="block text-sm font-medium text-gray-700">Guardian's Name</label>
+                        <input type="text" id="new-student-guardian" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div>
+                        <label for="new-student-contact" class="block text-sm font-medium text-gray-700">Contact Number</label>
+                        <input type="text" id="new-student-contact" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div>
+                        <label for="new-student-tuition-fee" class="block text-sm font-medium text-gray-700">Tuition Fee</label>
+                        <input type="number" id="new-student-tuition-fee" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="e.g., 500">
+                    </div>
+                     <div>
+                        <label for="new-student-vehicle-fee" class="block text-sm font-medium text-gray-700">Vehicle Fee (Optional)</label>
+                        <input type="number" id="new-student-vehicle-fee" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="e.g., 300">
+                    </div>
+                     <div>
+                        <label for="new-student-vehicle-no" class="block text-sm font-medium text-gray-700">Vehicle No. (Optional)</label>
+                        <input type="text" id="new-student-vehicle-no" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="e.g., DH-1234">
+                    </div>
+                    <div>
+                        <label for="new-student-station" class="block text-sm font-medium text-gray-700">Station Name (Optional)</label>
+                        <input type="text" id="new-student-station" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="e.g., Main Stop">
+                    </div>
+                     <div>
+                        <label for="new-student-dob" class="block text-sm font-medium text-gray-700">Date of Birth</label>
+                        <input type="date" id="new-student-dob" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div>
+                        <label for="new-student-blood-group" class="block text-sm font-medium text-gray-700">Blood Group</label>
+                        <input type="text" id="new-student-blood-group" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="e.g., A+">
+                    </div>
+                     <div>
+                        <label for="new-student-status" class="block text-sm font-medium text-gray-700">Status</label>
+                        <select id="new-student-status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                            <option value="active">Active</option>
+                            <option value="transferred">Transferred</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="new-student-admission-month" class="block text-sm font-medium text-gray-700">Admission Month (for Tuition)</label>
+                        <select id="new-student-admission-month" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></select>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-end space-x-4">
+                    <button type="button" id="student-modal-close-btn" class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300">Cancel</button>
+                    <button type="submit" class="btn-primary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700">Submit Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal for Add/Edit Teacher -->
+    <div id="teacher-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-40 hidden opacity-0">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl p-8 overflow-y-auto max-h-screen">
+            <h2 id="teacher-modal-title" class="text-2xl font-bold text-gray-800 mb-6">Add New Teacher</h2>
+            <form id="teacher-form">
+                <input type="hidden" id="teacher-edit-id">
+                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label for="employee-type" class="block text-sm font-medium text-gray-700">Employee Type</label>
+                        <select id="employee-type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required></select>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <label for="teacher-name" class="block text-sm font-medium text-gray-700">Teacher Name</label>
+                        <input type="text" id="teacher-name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                    </div>
+                    <div>
+                        <label for="teacher-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                        <input type="text" id="teacher-phone" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                     <div>
+                        <label for="teacher-phone-extra" class="block text-sm font-medium text-gray-700">Phone Number (Extra)</label>
+                        <input type="text" id="teacher-phone-extra" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div>
+                        <label for="teacher-nid" class="block text-sm font-medium text-gray-700">NID No.</label>
+                        <input type="text" id="teacher-nid" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                     <div>
+                        <label for="teacher-dob" class="block text-sm font-medium text-gray-700">Date of Birth</label>
+                        <input type="date" id="teacher-dob" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div>
+                        <label for="teacher-father" class="block text-sm font-medium text-gray-700">Father's Name</label>
+                        <input type="text" id="teacher-father" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div>
+                        <label for="teacher-mother" class="block text-sm font-medium text-gray-700">Mother's Name</label>
+                        <input type="text" id="teacher-mother" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                     <div class="lg:col-span-3">
+                        <label for="teacher-address" class="block text-sm font-medium text-gray-700">Address</label>
+                        <textarea id="teacher-address" rows="2" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
+                    </div>
+                     <div>
+                        <label for="teacher-subject" class="block text-sm font-medium text-gray-700">Subject</label>
+                        <input type="text" id="teacher-subject" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div>
+                        <label for="teacher-joining" class="block text-sm font-medium text-gray-700">Joining Date</label>
+                        <input type="date" id="teacher-joining" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                     <div>
+                        <label for="teacher-resign" class="block text-sm font-medium text-gray-700">Resign Date</label>
+                        <input type="date" id="teacher-resign" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                     <div>
+                        <label for="teacher-salary" class="block text-sm font-medium text-gray-700">Salary</label>
+                        <input type="number" id="teacher-salary" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div>
+                        <label for="teacher-bank-ac" class="block text-sm font-medium text-gray-700">Bank Account No.</label>
+                        <input type="text" id="teacher-bank-ac" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div>
+                        <label for="teacher-bank-name" class="block text-sm font-medium text-gray-700">Bank & Branch Name</label>
+                        <input type="text" id="teacher-bank-name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                 </div>
+                <div class="mt-8 flex justify-end space-x-4">
+                    <button type="button" id="teacher-modal-close-btn" class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300">Cancel</button>
+                    <button type="submit" class="btn-primary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700">Submit Teacher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("INDEX.HTML SCRIPT IS RUNNING!");
+
+        // --- Configuration ---
+        // !!! IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL !!!
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwRtRpcc5Oehu8Td_FcFTLB6AJX7HbDc9YxF1BKfzPfgqEwfmAN8dJ96aRnIhZnNapLwQ/exec'; // Example: 'https://script.google.com/macros/s/AKfycbz_xyz123abc/exec'
+
+        // --- Data Structures (Client-side, will be populated from Apps Script) ---
+        const classData = {
+            "6": ["GOLAP", "SHAPLA", "BELI", "SHEULY", "TAGAR", "BAKUL", "RAJANIGANDHA"],
+            "7": ["DOYEL", "KOYEL", "MOYNA", "TIYA", "EAGLE", "KOKIL"],
+            "8": ["SHITOLOKKHA", "MEGHNA", "PADMA", "JAMUNA"],
+            "9": ["LAL", "SABUJ"],
+            "10": ["AAM", "JAM"]
+        };
+        const studentFeeTypes = ["TUITION FEE", "VEHICLE FEE", "ADMISSION", "RE-ADMISSION", "HALF YEARLY EXAM", "YEARLY EXAM"];
+        const classFeeTypes = ["MONTHLY TEST", "DIARY", "TIE", "BAG", "SPORTS", "ID CARD", "ID CARD HOLDER", "ID CARD RIBBON", "MILAD", "OTHERS"];
+        const allFeeTypes = [...studentFeeTypes, ...classFeeTypes];
+        const expenseTypes = ["Salaries", "Utilities", "Maintenance", "Supplies", "Other"];
+        const employeeTypes = ["Assistant Teacher", "Accounts Officer", "Computer Operator", "Office Staff", "Assistant Head Teacher", "Head Teacher"];
+        const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        // Global data storage (populated on login/refresh)
+        let feePayments = [];
+        let studentDetails = [];
+        let schoolExpenses = [];
+        let teachersInfo = [];
+
+        let currentUser = null; // Stores { email, role, assignedClass, assignedSection }
+
+        // --- DOM Elements ---
+        const allDomElements = {
+            appContainer: document.getElementById('app-container'),
+            loginPage: document.getElementById('page-login'),
+            loginForm: document.getElementById('login-form'),
+            loginMessage: document.getElementById('login-message'),
+            mainAppContent: document.getElementById('main-app-content'),
+            sidebar: document.getElementById('sidebar'),
+            pages: document.querySelectorAll('#content > section'),
+            navButtons: {
+                payments: document.getElementById('btn-payments'),
+                expenses: document.getElementById('btn-expenses'),
+                students: document.getElementById('btn-students'),
+                teachers: document.getElementById('btn-teachers'),
+                teacherSalary: document.getElementById('btn-teacher-salary'),
+                vehicles: document.getElementById('btn-vehicles'),
+                dashboard: document.getElementById('btn-dashboard')
+            },
+            paymentsTableBody: document.getElementById('payments-table-body'),
+            paymentModal: document.getElementById('payment-modal'),
+            addPaymentBtn: document.getElementById('add-payment-btn'),
+            paymentModalCloseBtn: document.getElementById('payment-modal-close-btn'),
+            paymentForm: document.getElementById('payment-form'),
+            filterPaymentIdInput: document.getElementById('filter-payment-id'),
+            clearPaymentFiltersBtn: document.getElementById('clear-payment-filters-btn'),
+            studentInfoBox: document.getElementById('student-info-box'),
+            studentPaymentFields: document.getElementById('student-payment-fields'),
+            classPaymentFields: document.getElementById('class-payment-fields'),
+            amountLabel: document.getElementById('amount-label'),
+            expensesTableBody: document.getElementById('expenses-table-body'),
+            addExpenseBtn: document.getElementById('add-expense-btn'),
+            expenseModal: document.getElementById('expense-modal'),
+            expenseModalCloseBtn: document.getElementById('expense-modal-close-btn'),
+            expenseForm: document.getElementById('expense-form'),
+            expenseEditIdInput: document.getElementById('expense-edit-id'),
+            filterExpenseTextInput: document.getElementById('filter-expense-text'),
+            clearExpenseFiltersBtn: document.getElementById('clear-expense-filters-btn'),
+            studentsTableBody: document.getElementById('students-table-body'),
+            studentsCardView: document.getElementById('students-card-view'),
+            addStudentBtn: document.getElementById('add-student-btn'),
+            studentModal: document.getElementById('student-modal'),
+            studentModalCloseBtn: document.getElementById('student-modal-close-btn'),
+            studentForm: document.getElementById('student-form'),
+            studentEditIdInput: document.getElementById('student-edit-id'),
+            teachersTableBody: document.getElementById('teachers-table-body'),
+            teachersCardView: document.getElementById('teachers-card-view'),
+            addTeacherBtn: document.getElementById('add-teacher-btn'),
+            teacherModal: document.getElementById('teacher-modal'),
+            teacherModalCloseBtn: document.getElementById('teacher-modal-close-btn'),
+            teacherForm: document.getElementById('teacher-form'),
+            teacherEditIdInput: document.getElementById('teacher-edit-id'),
+            filterClass: document.getElementById('filter-class'),
+            filterSection: document.getElementById('filter-section'),
+            clearStudentFiltersBtn: document.getElementById('clear-student-filters-btn'),
+            vehiclesTableBody: document.getElementById('vehicles-table-body'),
+            filterVehicleNoInput: document.getElementById('filter-vehicle-no'),
+            clearVehicleFiltersBtn: document.getElementById('clear-vehicle-filters-btn'),
+            dashboardKpis: document.getElementById('dashboard-kpis'),
+            dashFilterType: document.getElementById('dash-filter-type'),
+            dashFilterYear: document.getElementById('dash-filter-year'),
+            dashFilterMonth: document.getElementById('dash-filter-month'),
+            dashFilterClass: document.getElementById('dash-filter-class'),
+            dashFilterSection: document.getElementById('dash-filter-section'),
+            clearDashFiltersBtn: document.getElementById('clear-dash-filters-btn'),
+            menuToggle: document.getElementById('menu-toggle'),
+            modalOverlay: document.getElementById('modal-overlay'),
+            teacherSalaryTableBody: document.getElementById('teacher-salary-table-body'),
+            salaryMonthFilter: document.getElementById('salary-month-filter'),
+            salaryYearFilter: document.getElementById('salary-year-filter'),
+            salarySheetMonthYear: document.getElementById('salary-sheet-month-year'),
+            totalSalaryAmount: document.getElementById('total-salary-amount'),
+            printSalaryBtn: document.getElementById('print-salary-btn'),
+            darkModeToggle: document.getElementById('dark-mode-toggle'),
+            darkModeIcon: document.getElementById('dark-mode-icon'),
+            darkModeText: document.getElementById('dark-mode-text'),
+            logoutBtn: document.getElementById('logout-btn'),
+            currentUserEmailSpan: document.getElementById('current-user-email'),
+            loadingOverlay: document.getElementById('loading-overlay'),
+            // New Student Modal Fields
+            newStudentDob: document.getElementById('new-student-dob'),
+            newStudentBloodGroup: document.getElementById('new-student-blood-group'),
+            newStudentStatus: document.getElementById('new-student-status'),
+            newStudentAdmissionMonth: document.getElementById('new-student-admission-month'),
+        };
+
+        // --- Utility Functions ---
+
+        const showLoading = () => {
+            console.log('Showing loading overlay...');
+            allDomElements.loadingOverlay.classList.remove('hidden');
+        };
+        const hideLoading = () => {
+            console.log('Hiding loading overlay...');
+            allDomElements.loadingOverlay.classList.add('hidden');
+        };
+
+        const showCustomAlert = (message, isError = true) => {
+            console.warn('Custom Alert:', message, 'Is Error:', isError);
+            allDomElements.loginMessage.textContent = message;
+            allDomElements.loginMessage.classList.toggle('text-red-600', isError);
+            allDomElements.loginMessage.classList.toggle('text-green-600', !isError);
+            allDomElements.loginMessage.classList.remove('hidden');
+        };
+
+        const clearCustomAlert = () => {
+            allDomElements.loginMessage.classList.add('hidden');
+            allDomElements.loginMessage.textContent = '';
+        };
+
+        /**
+         * Generic function to fetch data from Google Apps Script.
+         * @param {string} sheetName The name of the Google Sheet tab.
+         * @param {string} [id=''] Optional ID for fetching a single record.
+         * @param {Object} [additionalParams={}] Additional query parameters.
+         * @returns {Promise<Array<Object>|Object>} Fetched data or single object.
+         */
+        const fetchData = async (sheetName, id = '', additionalParams = {}) => {
+            showLoading();
+            try {
+                const url = new URL(APP_SCRIPT_URL);
+                url.searchParams.append('sheet', sheetName);
+                if (id) url.searchParams.append('id', id);
+                for (const key in additionalParams) {
+                    url.searchParams.append(key, additionalParams[key]);
+                }
+
+                console.log('Fetching data from URL:', url.toString());
+
+                const response = await fetch(url.toString());
+                if (!response.ok) {
+                    const errorText = await response.text(); // Get raw error response
+                    throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText}`);
+                }
+                const result = await response.json();
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+                console.log(`Successfully fetched data for ${sheetName}:`, result.data || result);
+                return result.data || result; // Apps Script might return { data: [...] } or just [...]
+            } catch (error) {
+                console.error(`Error fetching data from ${sheetName}:`, error);
+                showCustomAlert(`Error fetching data from ${sheetName}: ${error.message}`);
+                return []; // Return empty array on error for table rendering
+            } finally {
+                hideLoading();
+            }
+        };
+
+        /**
+         * Generic function to send data (add, update, delete, login) to Google Apps Script.
+         * @param {string} action The action to perform ('add', 'update', 'delete', 'login').
+         * @param {string} sheetName The name of the Google Sheet tab.
+         * @param {Object} data The data payload.
+         * @param {string} [id=''] Optional ID for update/delete actions.
+         * @returns {Promise<Object>} API response.
+         */
+        const sendData = async (action, sheetName, data, id = '') => {
+            showLoading();
+            try {
+                const url = new URL(APP_SCRIPT_URL);
+                url.searchParams.append('action', action);
+                url.searchParams.append('sheet', sheetName);
+                if (id) url.searchParams.append('id', id);
+
+                console.log(`Sending data for action: ${action}, sheet: ${sheetName}, id: ${id}, payload:`, data);
+
+                const response = await fetch(url.toString(), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8', // Important for Apps Script POST data parsing
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text(); // Get raw error response
+                    throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText}`);
+                }
+                const result = await response.json();
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+                console.log(`API response for ${action} on ${sheetName}:`, result);
+                return result;
+            } catch (error) {
+                console.error(`Error sending data for ${action} on ${sheetName}:`, error);
+                showCustomAlert(`Operation failed: ${error.message}`);
+                return { success: false, error: error.message };
+            } finally {
+                hideLoading();
+            }
+        };
+
+        // --- Core Application Functions ---
+
+        const loginUser = async (email, password) => {
+            clearCustomAlert();
+            console.log('Attempting login for:', email);
+            const result = await sendData('login', 'Users', { email, password }); // 'Users' is the sheet for credentials
+            if (result.success && result.user) {
+                currentUser = result.user;
+                console.log('Login successful! Current User:', currentUser);
+                allDomElements.currentUserEmailSpan.textContent = currentUser.email;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser)); // Persist login
+                allDomElements.loginPage.classList.add('hidden');
+                allDomElements.mainAppContent.classList.remove('hidden');
+                await loadAllDataAndRenderUI(); // Load all app data after successful login
+                applyRolePermissions(); // Apply permissions based on role
+                // Navigate to a default page based on role or 'students'
+                if (currentUser.role === 'Director') {
+                    switchPage('dashboard');
+                } else {
+                    switchPage('students'); // Class teachers or Accounts officers
+                }
+            } else {
+                console.error('Login failed:', result.message);
+                showCustomAlert(result.message || 'Login failed. Please check your credentials.');
+            }
+        };
+
+        const logoutUser = () => {
+            console.log('Logging out user:', currentUser?.email);
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            allDomElements.mainAppContent.classList.add('hidden');
+            allDomElements.loginPage.classList.remove('hidden');
+            clearCustomAlert();
+            allDomElements.loginForm.reset();
+            // Reset filters and data to ensure clean state on next login
+            feePayments = [];
+            studentDetails = [];
+            schoolExpenses = [];
+            teachersInfo = [];
+        };
+
+        const applyRolePermissions = () => {
+            console.log('Applying role permissions for:', currentUser?.role);
+            // Hide all sidebar buttons initially
+            Object.values(allDomElements.navButtons).forEach(btn => btn.classList.add('hidden'));
+            // Hide all "Add" buttons and "Edit" action headers by default
+            document.querySelectorAll('.btn-primary, .btn-secondary').forEach(btn => btn.classList.add('hidden'));
+            document.querySelectorAll('.edit-action-header').forEach(header => header.classList.add('hidden'));
+            // Hide edit action cells in tables initially
+            document.querySelectorAll('.edit-action-cell').forEach(cell => cell.classList.add('hidden'));
+
+
+            if (!currentUser) return; // Not logged in
+
+            const { role, assignedClass, assignedSection } = currentUser;
+
+            // Show relevant sidebar buttons based on role
+            if (role === 'Accounts Officer') {
+                allDomElements.navButtons.payments.classList.remove('hidden');
+                allDomElements.navButtons.expenses.classList.remove('hidden');
+                allDomElements.navButtons.students.classList.remove('hidden');
+                allDomElements.navButtons.teachers.classList.remove('hidden');
+                allDomElements.navButtons.teacherSalary.classList.remove('hidden');
+                allDomElements.navButtons.vehicles.classList.remove('hidden');
+                allDomElements.navButtons.dashboard.classList.remove('hidden');
+                // Allow add/edit for Accounts Officer
+                document.querySelectorAll('.btn-primary, .btn-secondary').forEach(btn => btn.classList.remove('hidden'));
+                document.querySelectorAll('.edit-action-header').forEach(header => header.classList.remove('hidden'));
+                document.querySelectorAll('.edit-action-cell').forEach(cell => cell.classList.remove('hidden')); // Show specific edit cells
+
+            } else if (role === 'Class Teacher') {
+                allDomElements.navButtons.students.classList.remove('hidden'); // Can only see student list
+                // For class teachers, filter student list by assigned class/section
+                allDomElements.filterClass.value = assignedClass || '';
+                allDomElements.filterSection.value = assignedSection || '';
+                allDomElements.filterClass.disabled = true;
+                allDomElements.filterSection.disabled = true;
+                document.getElementById('clear-student-filters-btn').classList.add('hidden'); // Cannot clear filter
+                // Class teachers cannot add/edit students
+                allDomElements.addStudentBtn.classList.add('hidden');
+                // Hide student edit action header/cells for class teachers
+                document.querySelector('#page-students .edit-action-header').classList.add('hidden');
+                document.querySelectorAll('#page-students .edit-action-cell').forEach(cell => cell.classList.add('hidden'));
+
+
+            } else if (role === 'Director') {
+                allDomElements.navButtons.dashboard.classList.remove('hidden'); // Can only see dashboard
+            }
+             // Always show dark mode toggle and logout for any logged-in user
+             allDomElements.darkModeToggle.classList.remove('hidden');
+             allDomElements.logoutBtn.classList.remove('hidden');
+        };
+
+        const switchPage = async (pageId) => {
+            console.log('Switching to page:', pageId);
+            allDomElements.pages.forEach(p => p.classList.add('hidden'));
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+            } else {
+                console.warn(`Page ${pageId} not found or unauthorized for current role. Redirecting to dashboard.`);
+                switchPage('dashboard'); // Redirect to dashboard or another default
+                return;
+            }
+
+            Object.values(allDomElements.navButtons).forEach(btn => btn.classList.remove('active'));
+            allDomElements.navButtons[pageId]?.classList.add('active');
+
+            if (window.innerWidth < 1024) {
+                allDomElements.sidebar.classList.add('-translate-x-full');
+                allDomElements.modalOverlay.classList.add('hidden');
+            }
+
+            // Re-render specific pages when navigating to ensure fresh data and permissions
+            // This is crucial after data changes or role application
+            try {
+                if (pageId === 'payments') await renderPaymentsTable();
+                else if (pageId === 'expenses') await renderExpensesTable();
+                else if (pageId === 'students') await renderStudentsTable();
+                else if (pageId === 'teachers') await renderTeachersView();
+                else if (pageId === 'teacherSalary') await renderTeacherSalaryTable();
+                else if (pageId === 'vehicles') await renderVehiclesTable();
+                else if (pageId === 'dashboard') await updateDashboard();
+            } catch (renderError) {
+                console.error(`Error rendering page ${pageId}:`, renderError);
+                showCustomAlert(`Error displaying page: ${renderError.message}`);
+            }
+        };
+
+
+        const loadAllDataAndRenderUI = async () => {
+            console.log('Starting loadAllDataAndRenderUI...');
+            // Fetch all data concurrently
+            showLoading();
+            try {
+                const [payments, students, expenses, teachers] = await Promise.all([
+                    fetchData('Payments'),
+                    fetchData('Students'),
+                    fetchData('Expenses'),
+                    fetchData('Teachers')
+                ]);
+                console.log('All data fetched. Payments:', payments.length, 'Students:', students.length, 'Expenses:', expenses.length, 'Teachers:', teachers.length);
+                feePayments = payments;
+                studentDetails = students;
+                schoolExpenses = expenses;
+                teachersInfo = teachers;
+
+                // Initial rendering after data is loaded
+                console.log('Rendering all tables/views...');
+                renderPaymentsTable();
+                renderExpensesTable();
+                renderStudentsTable();
+                renderVehiclesTable();
+                renderTeachersView();
+                populateDashboardYearFilter(); // Populates year filters based on loaded data
+                renderTeacherSalaryTable();
+                updateDashboard();
+                console.log('All tables/views rendered.');
+
+            } catch (error) {
+                console.error('Initial data load or rendering error:', error);
+                showCustomAlert('Failed to load initial data or render UI: ' + error.message);
+            } finally {
+                hideLoading();
+                console.log('loadAllDataAndRenderUI completed.');
+            }
+        };
+
+        // --- Payment Functions ---
+
+        const renderPaymentsTable = () => {
+            console.log('Rendering Payments Table...');
+            try {
+                allDomElements.paymentsTableBody.innerHTML = '';
+                // Filter payments if a studentId or classId is present in the filter input
+                const filterValue = allDomElements.filterPaymentIdInput.value.trim().toLowerCase();
+                const currentPayments = filterValue
+                    ? feePayments.filter(p => p.studentId && p.studentId.toLowerCase().includes(filterValue))
+                    : feePayments;
+
+                currentPayments.forEach((payment) => {
+                    const row = `<tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 table-cell-nowrap">${payment.receiptNo}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${payment.date}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${payment.studentId}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${payment.feeType}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${Array.isArray(payment.month) ? payment.month.join(', ') : payment.month || 'N/A'}</td>
+                            <td class="px-6 py-4 table-cell-nowrap font-medium text-gray-900">$${payment.amount}</td>
+                            <td class="px-6 py-4">${payment.description || ''}</td>
+                            <td class="px-6 py-4 table-cell-nowrap edit-action-cell">${(currentUser && currentUser.role === 'Accounts Officer' && studentFeeTypes.includes(payment.feeType)) ? `<button data-id="${payment.id}" class="edit-payment-btn text-indigo-600 hover:text-indigo-900 font-medium">Edit</button>` : ''}</td>
+                        </tr>`;
+                    allDomElements.paymentsTableBody.innerHTML += row;
+                });
+                // Adjust visibility of the "Actions" header based on permissions
+                document.querySelector('#page-payments .edit-action-header').classList.toggle('hidden', currentUser && currentUser.role !== 'Accounts Officer');
+                document.querySelectorAll('#page-payments .edit-action-cell').forEach(cell => cell.classList.toggle('hidden', currentUser && currentUser.role !== 'Accounts Officer'));
+
+                console.log('Payments Table Rendered.');
+            } catch (error) {
+                console.error('Error in renderPaymentsTable:', error);
+                showCustomAlert('Error rendering payments table: ' + error.message);
+            }
+        };
+        
+        const togglePaymentFormFields = (feeType) => {
+            console.log('Toggling payment form fields for fee type:', feeType);
+             if (studentFeeTypes.includes(feeType)) {
+                allDomElements.studentPaymentFields.classList.remove('hidden');
+                allDomElements.classPaymentFields.classList.add('hidden');
+                document.getElementById('receipt-no-student').required = true;
+                document.getElementById('student-id').required = true;
+                document.getElementById('payment-class').required = false;
+                document.getElementById('payment-section').required = false;
+                document.getElementById('receipt-no-class').required = false;
+                allDomElements.amountLabel.textContent = 'Amount (per month)';
+             } else if (classFeeTypes.includes(feeType)) {
+                allDomElements.studentPaymentFields.classList.add('hidden');
+                allDomElements.classPaymentFields.classList.remove('hidden');
+                document.getElementById('receipt-no-student').required = false;
+                document.getElementById('student-id').required = false;
+                document.getElementById('payment-class').required = true;
+                document.getElementById('payment-section').required = true;
+                document.getElementById('receipt-no-class').required = true;
+                allDomElements.amountLabel.textContent = 'Total Amount Collected';
+             }
+        };
+
+        const openPaymentModal = async (paymentId = null) => {
+            console.log('Opening Payment Modal. ID:', paymentId);
+            allDomElements.paymentForm.reset();
+            document.getElementById('edit-row-index').value = '';
+            allDomElements.studentInfoBox.classList.add('hidden');
+            document.getElementById('fee-type').disabled = false;
+
+            if (paymentId !== null) {
+                document.getElementById('modal-title').textContent = 'Edit Payment';
+                document.getElementById('fee-type').disabled = true;
+                const payment = feePayments.find(p => p.id == paymentId); // Use == for ID comparison
+                if (!payment) { showCustomAlert('Payment not found for editing.'); return; }
+
+                document.getElementById('edit-row-index').value = payment.id;
+                document.getElementById('receipt-no-student').value = payment.receiptNo;
+                document.getElementById('payment-year').value = payment.year;
+                document.getElementById('payment-date').value = payment.date;
+                const studentIdInput = document.getElementById('student-id');
+                studentIdInput.value = payment.studentId;
+                validateStudentIdInForm({target: studentIdInput});
+                document.getElementById('fee-type').value = payment.feeType;
+                togglePaymentFormFields(payment.feeType);
+                // Handle months for multi-select
+                const monthsToSelect = Array.isArray(payment.month) ? payment.month : [payment.month];
+                Array.from(document.getElementById('month').options).forEach(option => {
+                    option.selected = monthsToSelect.includes(option.value);
+                });
+                document.getElementById('amount').value = payment.amount;
+                document.getElementById('payment-description').value = payment.description;
+            } else {
+                document.getElementById('modal-title').textContent = 'Add New Payment';
+                document.getElementById('payment-date').value = new Date().toISOString().split('T')[0];
+                document.getElementById('payment-year').value = new Date().getFullYear();
+                togglePaymentFormFields(document.getElementById('fee-type').value);
+                // Clear any pre-selected months
+                Array.from(document.getElementById('month').options).forEach(option => option.selected = false);
+            }
+            allDomElements.paymentModal.classList.remove('hidden');
+            setTimeout(() => allDomElements.paymentModal.classList.remove('opacity-0'), 10);
+        };
+        
+        const closePaymentModal = () => {
+            console.log('Closing Payment Modal.');
+            allDomElements.paymentModal.classList.add('opacity-0');
+            setTimeout(() => allDomElements.paymentModal.classList.add('hidden'), 300);
+        };
+
+        const validateStudentIdInForm = (e) => {
+            console.log('Validating student ID in form...');
+            const studentId = e.target.value;
+            const student = studentDetails.find(s => s.id && s.id.toLowerCase() === studentId.toLowerCase());
+            if (student) {
+                allDomElements.studentInfoBox.innerHTML = `
+                    <p class="text-sm"><strong class="font-semibold text-gray-800">Name:</strong> ${student.name}</p>
+                    <p class="text-sm"><strong class="font-semibold text-gray-800">Guardian:</strong> ${student.guardian}</p>
+                    <p class="text-sm"><strong class="font-semibold text-gray-800">Class:</strong> ${student.class}-${student.section} | <strong class="font-semibold text-gray-800">Roll:</strong> ${student.roll}</p>`;
+                allDomElements.studentInfoBox.classList.remove('hidden');
+                autoFillFeeAmount(document.getElementById('fee-type').value, student);
+            } else {
+                allDomElements.studentInfoBox.classList.add('hidden');
+            }
+        };
+
+        const autoFillFeeAmount = (feeType, student = null) => {
+            console.log('Auto-filling fee amount for fee type:', feeType);
+             if (!student) student = studentDetails.find(s => s.id && s.id.toLowerCase() === document.getElementById('student-id').value.toLowerCase());
+             if (!student) return;
+             const amountInput = document.getElementById('amount');
+             if (feeType === 'TUITION FEE') amountInput.value = student.tuitionFee || '';
+             else if (feeType === 'VEHICLE FEE') amountInput.value = student.vehicleFee || '';
+        };
+
+        const handlePaymentFormSubmit = async (e) => {
+            e.preventDefault();
+            console.log('Handling Payment Form Submit...');
+            const editId = document.getElementById('edit-row-index').value;
+            const feeType = document.getElementById('fee-type').value;
+
+            const commonData = {
+                year: parseInt(document.getElementById('payment-year').value),
+                date: document.getElementById('payment-date').value,
+                feeType: feeType,
+                amount: parseFloat(document.getElementById('amount').value),
+                description: document.getElementById('payment-description').value,
+            };
+
+            let result;
+            if (editId) {
+                // Update existing payment
+                result = await sendData('update', 'Payments', { ...commonData, receiptNo: document.getElementById('receipt-no-student').value, month: Array.from(document.getElementById('month').selectedOptions).map(opt => opt.value),}, editId);
+            } else if (studentFeeTypes.includes(feeType)) {
+                const selectedMonths = Array.from(document.getElementById('month').selectedOptions).map(opt => opt.value);
+                if (selectedMonths.length === 0 && feeType !== 'ADMISSION' && feeType !== 'RE-ADMISSION' && feeType !== 'HALF YEARLY EXAM' && feeType !== 'YEARLY EXAM') {
+                    showCustomAlert('Please select at least one month for student payments, or ensure it is a one-time fee type.');
+                    return;
+                }
+                const studentIdVal = document.getElementById('student-id').value;
+                if (!studentIdVal) { showCustomAlert('Please enter a Student ID.'); return; }
+                const receiptNoStudentVal = document.getElementById('receipt-no-student').value;
+                if (!receiptNoStudentVal) { showCustomAlert('Please enter a Receipt No.'); return; }
+
+                if (feeType === 'ADMISSION' || feeType === 'RE-ADMISSION' || feeType === 'HALF YEARLY EXAM' || feeType === 'YEARLY EXAM') {
+                    // For one-time fees, add a single payment without month
+                    result = await sendData('add', 'Payments', { ...commonData, studentId: studentIdVal, receiptNo: receiptNoStudentVal, month: 'N/A' });
+                } else {
+                    // For monthly fees, add a payment for each selected month
+                    for (const month of selectedMonths) {
+                        await sendData('add', 'Payments', { ...commonData, month, studentId: studentIdVal, receiptNo: receiptNoStudentVal });
+                    }
+                    result = { success: true }; // Assuming success if all individual adds work
+                }
+            } else if (classFeeTypes.includes(feeType)) {
+                const targetClass = document.getElementById('payment-class').value;
+                const targetSection = document.getElementById('payment-section').value;
+                const receiptNoClassVal = document.getElementById('receipt-no-class').value;
+
+                if (!targetClass || !targetSection || !receiptNoClassVal) {
+                    showCustomAlert('Please select Class, Section, and enter Receipt No. for class payments.');
+                    return;
+                }
+                const selectedMonths = Array.from(document.getElementById('month').selectedOptions).map(opt => opt.value);
+                if (selectedMonths.length === 0) {
+                     showCustomAlert('Please select at least one month for class payments.');
+                    return;
+                }
+                
+                // For class payments, add a payment for each selected month
+                for (const month of selectedMonths) {
+                    await sendData('add', 'Payments', { ...commonData, month, studentId: `CLASS-${targetClass}-${targetSection}`, receiptNo: receiptNoClassVal, month: month });
+                }
+                result = { success: true }; // Assuming success if all individual adds work
+            }
+
+            if (result && result.success) { // Check result is not null/undefined before checking success
+                showCustomAlert('Payment saved successfully!', false);
+                closePaymentModal();
+                await loadAllDataAndRenderUI(); // Reload all data after changes
+            }
+        };
+
+        // --- Expense Functions ---
+
+        const renderExpensesTable = () => {
+            console.log('Rendering Expenses Table...');
+            try {
+                allDomElements.expensesTableBody.innerHTML = '';
+                 // Filter expenses if search term is present
+                const searchTerm = allDomElements.filterExpenseTextInput.value.toLowerCase();
+                const currentExpenses = searchTerm
+                    ? schoolExpenses.filter(ex => ex.type && ex.type.toLowerCase().includes(searchTerm) || ex.description && ex.description.toLowerCase().includes(searchTerm))
+                    : schoolExpenses;
+
+                currentExpenses.forEach(expense => {
+                    const row = `<tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 table-cell-nowrap">${expense.receiptNo}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${expense.date}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${expense.type}</td>
+                            <td class="px-6 py-4 table-cell-nowrap font-medium text-gray-900">$${expense.amount}</td>
+                            <td class="px-6 py-4">${expense.description}</td>
+                            <td class="px-6 py-4 table-cell-nowrap edit-action-cell">${currentUser && currentUser.role === 'Accounts Officer' ? `<button data-id="${expense.id}" class="edit-expense-btn text-indigo-600 hover:text-indigo-900 font-medium">Edit</button>` : ''}</td>
+                        </tr>`;
+                    allDomElements.expensesTableBody.innerHTML += row;
+                });
+                document.querySelector('#page-expenses .edit-action-header').classList.toggle('hidden', currentUser && currentUser.role !== 'Accounts Officer');
+                document.querySelectorAll('#page-expenses .edit-action-cell').forEach(cell => cell.classList.toggle('hidden', currentUser && currentUser.role !== 'Accounts Officer'));
+                console.log('Expenses Table Rendered.');
+            } catch (error) {
+                console.error('Error in renderExpensesTable:', error);
+                showCustomAlert('Error rendering expenses table: ' + error.message);
+            }
+        };
+
+        const openExpenseModal = (expenseId = null) => {
+            console.log('Opening Expense Modal. ID:', expenseId);
+            allDomElements.expenseForm.reset();
+            document.getElementById('expense-edit-id').value = '';
+            const title = document.querySelector('#expense-modal h2');
+            if (expenseId) {
+                title.textContent = "Edit Expense";
+                const expense = schoolExpenses.find(e => e.id == expenseId);
+                if (!expense) { showCustomAlert('Expense not found for editing.'); return; }
+
+                document.getElementById('expense-edit-id').value = expense.id;
+                document.getElementById('expense-receipt-no').value = expense.receiptNo;
+                document.getElementById('expense-date').value = expense.date;
+                document.getElementById('expense-type').value = expense.type;
+                document.getElementById('expense-amount').value = expense.amount;
+                document.getElementById('expense-description').value = expense.description;
+            } else {
+                title.textContent = "Add New Expense";
+                document.getElementById('expense-date').value = new Date().toISOString().split('T')[0];
+            }
+            allDomElements.expenseModal.classList.remove('hidden');
+            setTimeout(() => allDomElements.expenseModal.classList.remove('opacity-0'), 10);
+        };
+
+        const closeExpenseModal = () => {
+            console.log('Closing Expense Modal.');
+            allDomElements.expenseModal.classList.add('opacity-0');
+            setTimeout(() => allDomElements.expenseModal.classList.add('hidden'), 300);
+        };
+        
+        const handleExpenseFormSubmit = async (e) => {
+            e.preventDefault();
+            console.log('Handling Expense Form Submit...');
+            const editId = document.getElementById('expense-edit-id').value;
+            const expenseData = {
+                receiptNo: document.getElementById('expense-receipt-no').value,
+                date: document.getElementById('expense-date').value,
+                type: document.getElementById('expense-type').value,
+                amount: parseFloat(document.getElementById('expense-amount').value),
+                description: document.getElementById('expense-description').value,
+            };
+            let result;
+            if(editId) {
+                result = await sendData('update', 'Expenses', expenseData, editId);
+            } else {
+                result = await sendData('add', 'Expenses', expenseData);
+            }
+            if (result && result.success) {
+                showCustomAlert('Expense saved successfully!', false);
+                closeExpenseModal();
+                await loadAllDataAndRenderUI();
+            }
+        };
+
+        // --- Student Functions ---
+
+        const populateClassFilter = (selectElement, includeAll = true) => {
+            console.log('Populating class filter...');
+            let options = includeAll ? '<option value="">All Classes</option>' : '';
+            Object.keys(classData).forEach(c => options += `<option value="${c}">${c}</option>`);
+            selectElement.innerHTML = options;
+        };
+
+        const updateSectionFilter = (classSelect, sectionSelect) => {
+            console.log('Updating section filter...');
+            const selectedClass = classSelect.value;
+            let options = '<option value="">All Sections</option>';
+            if (selectedClass && classData[selectedClass]) {
+                classData[selectedClass].forEach(s => options += `<option value="${s}">${s}</option>`);
+            }
+            sectionSelect.innerHTML = options;
+        };
+
+        const openStudentModal = async (studentId = null) => {
+            console.log('Opening Student Modal. ID:', studentId);
+            allDomElements.studentForm.reset();
+            const classDropdown = document.getElementById('new-student-class');
+            const sectionDropdown = document.getElementById('new-student-section');
+            const admissionMonthDropdown = allDomElements.newStudentAdmissionMonth;
+            
+            populateClassFilter(classDropdown, false);
+            admissionMonthDropdown.innerHTML = monthOrder.map(m => `<option value="${m}">${m}</option>`).join('');
+            
+            document.getElementById('new-student-id').disabled = false;
+            if(studentId !== null){
+                document.getElementById('student-modal-title').textContent = 'Edit Student';
+                const student = studentDetails.find(s => s.id == studentId);
+                if (!student) { showCustomAlert('Student not found for editing.'); return; }
+
+                allDomElements.studentEditIdInput.value = student.id;
+                document.getElementById('new-student-id').value = student.id;
+                document.getElementById('new-student-id').disabled = true; // Prevent changing ID on edit
+                document.getElementById('new-student-name').value = student.name;
+                classDropdown.value = student.class;
+                updateSectionFilter(classDropdown, sectionDropdown);
+                sectionDropdown.value = student.section;
+                document.getElementById('new-student-roll').value = student.roll;
+                document.getElementById('new-student-address').value = student.address;
+                document.getElementById('new-student-guardian').value = student.guardian;
+                document.getElementById('new-student-contact').value = student.contact;
+                document.getElementById('new-student-tuition-fee').value = student.tuitionFee;
+                document.getElementById('new-student-vehicle-no').value = student.vehicleNo;
+                document.getElementById('new-student-vehicle-fee').value = student.vehicleFee;
+                document.getElementById('new-student-station').value = student.stationName;
+                allDomElements.newStudentDob.value = student.dateofbirth;
+                allDomElements.newStudentBloodGroup.value = student['blood-group'];
+                allDomElements.newStudentStatus.value = student.status;
+                allDomElements.newStudentAdmissionMonth.value = student.admission_month;
+
+            } else {
+                document.getElementById('student-modal-title').textContent = 'Add New Student';
+                updateSectionFilter(classDropdown, sectionDropdown);
+                admissionMonthDropdown.value = monthOrder[new Date().getMonth()]; // Default to current month
+            }
+            allDomElements.studentModal.classList.remove('hidden');
+            setTimeout(() => allDomElements.studentModal.classList.remove('opacity-0'), 10);
+        };
+        
+        const closeStudentModal = () => {
+            console.log('Closing Student Modal.');
+            allDomElements.studentModal.classList.add('opacity-0');
+            setTimeout(() => allDomElements.studentModal.classList.add('hidden'), 300);
+        };
+        
+        const handleStudentFormSubmit = async (e) => {
+            e.preventDefault();
+            console.log('Handling Student Form Submit...');
+            const studentData = {
+                id: document.getElementById('new-student-id').value.toUpperCase(),
+                name: document.getElementById('new-student-name').value,
+                class: parseInt(document.getElementById('new-student-class').value),
+                section: document.getElementById('new-student-section').value,
+                roll: parseInt(document.getElementById('new-student-roll').value),
+                address: document.getElementById('new-student-address').value,
+                guardian: document.getElementById('new-student-guardian').value,
+                contact: document.getElementById('new-student-contact').value,
+                tuitionFee: parseFloat(document.getElementById('new-student-tuition-fee').value) || 0,
+                vehicleNo: document.getElementById('new-student-vehicle-no').value,
+                vehicleFee: parseFloat(document.getElementById('new-student-vehicle-fee').value) || null,
+                stationName: document.getElementById('new-student-station').value,
+                dateofbirth: allDomElements.newStudentDob.value,
+                'blood-group': allDomElements.newStudentBloodGroup.value,
+                status: allDomElements.newStudentStatus.value,
+                admission_month: allDomElements.newStudentAdmissionMonth.value,
+            };
+            const editId = allDomElements.studentEditIdInput.value;
+            let result;
+            if(editId) {
+                result = await sendData('update', 'Students', studentData, editId);
+            } else {
+                 // Check for duplicate student ID before adding
+                 const existingStudent = studentDetails.find(s => s.id === studentData.id);
+                 if (existingStudent) { showCustomAlert('Student ID already exists!'); return; }
+                result = await sendData('add', 'Students', studentData);
+            }
+            if (result && result.success) {
+                showCustomAlert('Student saved successfully!', false);
+                closeStudentModal();
+                await loadAllDataAndRenderUI();
+            }
+        };
+
+        /**
+         * Calculates the months for which tuition is due for a student.
+         * Assumes tuition is paid for the *previous* month.
+         * @param {Object} student The student object.
+         * @param {Array<Object>} payments All payment records.
+         * @returns {string} Comma-separated string of due months or 'N/A' or 'Up-to-date'.
+         */
+        const calculateStudentDueMonths = (student, payments) => {
+            console.log('Calculating due months for student:', student.id);
+            if (student.status === 'transferred') return 'N/A (Transferred)';
+            if (!student.admission_month) return 'N/A (No admission month)';
+
+
+            const studentTuitionPayments = payments.filter(p =>
+                p.studentId === student.id &&
+                p.feeType === 'TUITION FEE' &&
+                p.year === currentYear
+            );
+
+            // Get last paid month for tuition fee this year
+            let lastPaidMonthIndex = -1; // -1 means no payments for the current year yet
+            studentTuitionPayments.forEach(p => {
+                const month = Array.isArray(p.month) ? p.month[0] : p.month;
+                const monthIdx = monthOrder.indexOf(month);
+                if (monthIdx > lastPaidMonthIndex) {
+                    lastPaidMonthIndex = monthIdx;
+                }
+            });
+
+            // Determine the "expected paid up to" month. If current month is July (idx 6), we expect payment for June (idx 5).
+            const today = new Date();
+            const currentMonthIdx = today.getMonth(); // 0 for Jan, 11 for Dec
+            const currentYear = today.getFullYear();
+
+            // Handle cases for year transitions or early payments
+            let expectedPaidUpToIndex;
+            if (today.getDate() < 10) { // If it's early in the month (e.g., July 5th), consider last month as the "current" due reference
+                expectedPaidUpToIndex = currentMonthIdx - 1;
+            } else { // If it's later in the month (e.g., July 15th), consider current month as the "current" due reference
+                expectedPaidUpToIndex = currentMonthIdx;
+            }
+            // Ensure expected index doesn't go below January
+            if (expectedPaidUpToIndex < 0) expectedPaidUpToIndex = 11; // December of previous year
+
+            const admissionMonthIndex = monthOrder.indexOf(student.admission_month);
+
+            const dueMonths = [];
+
+            for (let i = admissionMonthIndex; i <= expectedPaidUpToIndex; i++) {
+                if (i > lastPaidMonthIndex) { // If current iteration month is after the last paid month
+                    dueMonths.push(monthOrder[i]);
+                }
+            }
+            
+            // Special check: If lastPaidMonthIndex is December (11) and currentMonthIdx is January (0), it's "Up-to-date" for the new year.
+            if (lastPaidMonthIndex === 11 && currentMonthIdx === 0 && studentTuitionPayments.some(p => p.year === currentYear - 1 && monthOrder.includes(Array.isArray(p.month) ? p.month[0] : p.month) && monthOrder.indexOf(Array.isArray(p.month) ? p.month[0] : p.month) === 11)) {
+                 if (admissionMonthIndex > 0) { // if student admitted after Jan, they are up to date for Jan
+                     // But if they paid for current month, or previous month for current month fees, it is up to date
+                     // This indicates if all months from current month till admission month has been paid or not
+                     const allMonthsExpected = monthOrder.slice(admissionMonthIndex, expectedPaidUpToIndex + 1);
+                     const paidMonths = studentTuitionPayments.map(p => Array.isArray(p.month) ? p.month[0] : p.month);
+                     const remainingMonths = allMonthsExpected.filter(month => !paidMonths.includes(month));
+
+                    if (remainingMonths.length === 0) {
+                        return 'Up-to-date';
+                    } else {
+                        return remainingMonths.join(', ') + ' (Due)';
+                    }
+                 }
+                return 'Up-to-date';
+            }
+
+
+            if (dueMonths.length === 0) {
+                return 'Up-to-date';
+            } else {
+                return dueMonths.join(', ') + ' (Due)';
+            }
+        };
+
+
+        const renderStudentsTable = () => {
+            console.log('Rendering Students Table...');
+            try {
+                let filteredStudents = studentDetails.filter(student => {
+                    const isClassTeacher = currentUser && currentUser.role === 'Class Teacher';
+                    const matchesRoleAssignment = isClassTeacher
+                        ? (student.class == currentUser.assignedClass && student.section === currentUser.assignedSection)
+                        : true; // All students for Accounts Officer or Director
+
+                    const matchesFilter = (!allDomElements.filterClass.value || student.class == allDomElements.filterClass.value) &&
+                                          (!allDomElements.filterSection.value || student.section == allDomElements.filterSection.value);
+                    
+                    return matchesRoleAssignment && matchesFilter && student.status !== 'transferred'; // Only show active students
+                });
+
+                allDomElements.studentsTableBody.innerHTML = '';
+                allDomElements.studentsCardView.innerHTML = '';
+
+                const canEditStudents = currentUser && currentUser.role === 'Accounts Officer';
+                document.querySelector('#page-students .edit-action-header').classList.toggle('hidden', !canEditStudents);
+                allDomElements.addStudentBtn.classList.toggle('hidden', !canEditStudents);
+
+                filteredStudents.forEach(student => {
+                    const studentPayments = feePayments.filter(p => p.studentId === student.id);
+                    const findLastPaidMonth = (feeType) => studentPayments.filter(p => p.feeType === feeType && monthOrder.includes(Array.isArray(p.month) ? p.month[0] : p.month)).sort((a, b) => {
+                        const monthA = Array.isArray(a.month) ? a.month[0] : a.month;
+                        const monthB = Array.isArray(b.month) ? b.month[0] : b.month;
+                        return monthOrder.indexOf(monthB) - monthOrder.indexOf(monthA);
+                    })[0]?.month || 'N/A';
+                    const calculateTotal = (feeType) => studentPayments.filter(p => p.feeType === feeType).reduce((sum, p) => sum + p.amount, 0);
+                    const checkFeePaid = (feeType) => studentPayments.some(p => p.feeType === feeType) ? 'Yes' : 'No';
+                    const studentDueMonths = calculateStudentDueMonths(student, feePayments);
+                    
+                    const tableRow = `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 table-cell-nowrap">${student.id}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${student.name}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${student.class}-${student.section}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${student.roll}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${student.status}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${student['blood-group'] || 'N/A'}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${student.admission_month || 'N/A'}</td>
+                            <td class="px-6 py-4 table-cell-nowrap ${studentDueMonths.includes('Due') || studentDueMonths.includes(',') ? 'font-bold text-red-600' : 'text-green-600'}">${studentDueMonths}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${findLastPaidMonth('TUITION FEE')}</td>
+                            <td class="px-6 py-4 table-cell-nowrap font-semibold">$${calculateTotal('TUITION FEE')}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${findLastPaidMonth('VEHICLE FEE')}</td>
+                            <td class="px-6 py-4 table-cell-nowrap font-semibold">$${calculateTotal('VEHICLE FEE')}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${student.stationName || 'N/A'}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${checkFeePaid('HALF YEARLY EXAM')}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${checkFeePaid('YEARLY EXAM')}</td>
+                            <td class="px-6 py-4 table-cell-nowrap edit-action-cell">${canEditStudents ? `<button data-id="${student.id}" class="edit-student-btn text-indigo-600 hover:text-indigo-900 font-medium">Edit</button>` : ''}</td>
+                        </tr>`;
+                    allDomElements.studentsTableBody.innerHTML += tableRow;
+                    
+                    const card = `
+                        <div class="bg-white rounded-lg shadow-md p-4 space-y-2 border border-gray-200">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-bold text-lg">${student.name} <span class="font-normal text-sm text-gray-500">(${student.id})</span></p>
+                                    <p class="text-sm text-gray-600">Class: ${student.class}-${student.section} | Roll: ${student.roll}</p>
+                                    <p class="text-sm text-gray-600">Status: ${student.status} | Blood: ${student['blood-group'] || 'N/A'}</p>
+                                    <p class="text-sm font-semibold ${studentDueMonths.includes('Due') || studentDueMonths.includes(',') ? 'text-red-600' : 'text-green-600'}">Due: ${studentDueMonths}</p>
+                                </div>
+                                ${canEditStudents ? `<button data-id="${student.id}" class="edit-student-btn text-indigo-600 hover:text-indigo-900 font-medium text-sm">Edit</button>` : ''}
+                            </div>
+                            <div class="border-t pt-2 space-y-1 text-sm">
+                                <p><strong class="font-medium">Address:</strong> ${student.address || 'N/A'}</p>
+                                <p><strong class="font-medium">Tuition Last Paid:</strong> ${findLastPaidMonth('TUITION FEE')} ($${calculateTotal('TUITION FEE')})</p>
+                                <p><strong class="font-medium">Vehicle Last Paid:</strong> ${findLastPaidMonth('VEHICLE FEE')} ($${calculateTotal('VEHICLE FEE')})</p>
+                                <p><strong class="font-medium">Station:</strong> ${student.stationName || 'N/A'}</p>
+                            </div>
+                        </div>
+                    `;
+                    allDomElements.studentsCardView.innerHTML += card;
+                });
+                document.querySelectorAll('#page-students .edit-action-cell').forEach(cell => cell.classList.toggle('hidden', !canEditStudents));
+
+                console.log('Students Table Rendered.');
+            } catch (error) {
+                console.error('Error in renderStudentsTable:', error);
+                showCustomAlert('Error rendering students table: ' + error.message);
+            }
+        };
+
+        // --- Vehicle Functions ---
+
+        const renderVehiclesTable = () => {
+            console.log('Rendering Vehicles Table...');
+            try {
+                const filterValue = allDomElements.filterVehicleNoInput.value.trim().toLowerCase();
+                const vehicleStudents = studentDetails.filter(s => s.vehicleNo && s.vehicleNo.toLowerCase().includes(filterValue)).sort((a, b) => (a.vehicleFee || 0) - (b.vehicleFee || 0));
+                allDomElements.vehiclesTableBody.innerHTML = '';
+                vehicleStudents.forEach(student => {
+                     const studentPayments = feePayments.filter(p => p.studentId === student.id);
+                     const lastPaidMonth = studentPayments.filter(p => p.feeType === 'VEHICLE FEE' && monthOrder.includes(Array.isArray(p.month) ? p.month[0] : p.month)).sort((a, b) => {
+                        const monthA = Array.isArray(a.month) ? a.month[0] : a.month;
+                        const monthB = Array.isArray(b.month) ? b.month[0] : b.month;
+                        return monthOrder.indexOf(monthB) - monthOrder.indexOf(monthA);
+                     })[0]?.month || 'N/A';
+                     const totalPaid = studentPayments.filter(p => p.feeType === 'VEHICLE FEE').reduce((sum, p) => sum + p.amount, 0);
+                     const row = `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 table-cell-nowrap">${student.vehicleNo}</td><td class="px-6 py-4 table-cell-nowrap">${student.id}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${student.class}-${student.section}</td><td class="px-6 py-4 table-cell-nowrap">${student.roll}</td>
+                            <td class="px-6 py-4 table-cell-nowrap font-semibold">$${student.vehicleFee}</td><td class="px-6 py-4 table-cell-nowrap">${student.stationName}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${lastPaidMonth}</td><td class="px-6 py-4 table-cell-nowrap font-semibold">$${totalPaid}</td>
+                        </tr>`;
+                     allDomElements.vehiclesTableBody.innerHTML += row;
+                });
+                console.log('Vehicles Table Rendered.');
+            } catch (error) {
+                console.error('Error in renderVehiclesTable:', error);
+                showCustomAlert('Error rendering vehicles table: ' + error.message);
+            }
+        }
+
+        // --- Teacher Functions ---
+        
+        const renderTeachersView = () => {
+            console.log('Rendering Teachers View...');
+            try {
+                allDomElements.teachersTableBody.innerHTML = '';
+                allDomElements.teachersCardView.innerHTML = '';
+                const canEditTeachers = currentUser && currentUser.role === 'Accounts Officer';
+
+                teachersInfo.forEach(teacher => {
+                    const tableRow = `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 table-cell-nowrap">${teacher.name}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${teacher.type}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${teacher.subject}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${teacher.phone}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">$${teacher.salary.toLocaleString()}</td>
+                            <td class="px-6 py-4 table-cell-nowrap">${teacher.joining}</td>
+                            <td class="px-6 py-4 table-cell-nowrap edit-action-cell">${canEditTeachers ? `<button data-id="${teacher.id}" class="edit-teacher-btn text-indigo-600 hover:text-indigo-900 font-medium">Edit</button>` : ''}</td>
+                        </tr>`;
+                    allDomElements.teachersTableBody.innerHTML += tableRow;
+                    
+                    const card = `
+                         <div class="bg-white rounded-lg shadow-md p-4 space-y-2 border border-gray-200">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-bold text-lg">${teacher.name}</p>
+                                    <p class="text-sm text-gray-600">${teacher.type} | ${teacher.subject}</p>
+                                </div>
+                                ${canEditTeachers ? `<button data-id="${teacher.id}" class="edit-teacher-btn text-indigo-600 hover:text-indigo-900 font-medium text-sm">Edit</button>` : ''}
+                            </div>
+                            <div class="border-t pt-2 space-y-1 text-sm">
+                                <p><strong class="font-medium">Phone:</strong> ${teacher.phone}</p>
+                                <p><strong class="font-medium">Salary:</strong> $${teacher.salary.toLocaleString()}</p>
+                                <p><strong class="font-medium">Joined:</strong> ${teacher.joining}</p>
+                            </div>
+                        </div>
+                    `;
+                    allDomElements.teachersCardView.innerHTML += card;
+                });
+                document.querySelector('#page-teachers .edit-action-header').classList.toggle('hidden', !canEditTeachers);
+                document.querySelectorAll('#page-teachers .edit-action-cell').forEach(cell => cell.classList.toggle('hidden', !canEditTeachers));
+                allDomElements.addTeacherBtn.classList.toggle('hidden', !canEditTeachers);
+                console.log('Teachers View Rendered.');
+            } catch (error) {
+                console.error('Error in renderTeachersView:', error);
+                showCustomAlert('Error rendering teachers view: ' + error.message);
+            }
+        };
+        
+        const openTeacherModal = (teacherId = null) => {
+            console.log('Opening Teacher Modal. ID:', teacherId);
+            allDomElements.teacherForm.reset();
+            document.getElementById('teacher-edit-id').value = '';
+            const title = document.querySelector('#teacher-modal h2');
+            if (teacherId) {
+                title.textContent = 'Edit Teacher Information';
+                const teacher = teachersInfo.find(t => t.id == teacherId);
+                if (!teacher) { showCustomAlert('Teacher not found for editing.'); return; }
+
+                document.getElementById('teacher-edit-id').value = teacher.id;
+                document.getElementById('employee-type').value = teacher.type;
+                document.getElementById('teacher-name').value = teacher.name;
+                document.getElementById('teacher-phone').value = teacher.phone;
+                document.getElementById('teacher-phone-extra').value = teacher.phone_extra;
+                document.getElementById('teacher-father').value = teacher.father;
+                document.getElementById('teacher-mother').value = teacher.mother;
+                document.getElementById('teacher-nid').value = teacher.nid;
+                document.getElementById('teacher-dob').value = teacher.dob;
+                document.getElementById('teacher-address').value = teacher.address;
+                document.getElementById('teacher-subject').value = teacher.subject;
+                document.getElementById('teacher-joining').value = teacher.joining;
+                document.getElementById('teacher-resign').value = teacher.resign;
+                document.getElementById('teacher-salary').value = teacher.salary;
+                document.getElementById('teacher-bank-ac').value = teacher.bank_ac;
+                document.getElementById('teacher-bank-name').value = teacher.bank_name;
+            } else {
+                title.textContent = 'Add New Teacher';
+            }
+            allDomElements.teacherModal.classList.remove('hidden');
+            setTimeout(() => allDomElements.teacherModal.classList.remove('opacity-0'), 10);
+        };
+        
+        const closeTeacherModal = () => {
+            console.log('Closing Teacher Modal.');
+            allDomElements.teacherModal.classList.add('opacity-0');
+            setTimeout(() => allDomElements.teacherModal.classList.add('hidden'), 300);
+        };
+        
+        const handleTeacherFormSubmit = async (e) => {
+            e.preventDefault();
+            console.log('Handling Teacher Form Submit...');
+            const editId = document.getElementById('teacher-edit-id').value;
+            const teacherData = {
+                type: document.getElementById('employee-type').value,
+                name: document.getElementById('teacher-name').value,
+                phone: document.getElementById('teacher-phone').value,
+                phone_extra: document.getElementById('teacher-phone-extra').value,
+                father: document.getElementById('teacher-father').value,
+                mother: document.getElementById('teacher-mother').value,
+                nid: document.getElementById('teacher-nid').value,
+                dob: document.getElementById('teacher-dob').value,
+                address: document.getElementById('teacher-address').value,
+                subject: document.getElementById('teacher-subject').value,
+                joining: document.getElementById('teacher-joining').value,
+                resign: document.getElementById('teacher-resign').value,
+                salary: parseFloat(document.getElementById('teacher-salary').value) || 0,
+                bank_ac: document.getElementById('teacher-bank-ac').value,
+                bank_name: document.getElementById('teacher-bank-name').value,
+            };
+            let result;
+            if(editId) {
+                result = await sendData('update', 'Teachers', teacherData, editId);
+            } else {
+                result = await sendData('add', 'Teachers', teacherData);
+            }
+            if (result && result.success) {
+                showCustomAlert('Teacher saved successfully!', false);
+                closeTeacherModal();
+                await loadAllDataAndRenderUI();
+            }
+        };
+
+        const renderTeacherSalaryTable = () => {
+            console.log('Rendering Teacher Salary Table...');
+            try {
+                const selectedMonth = allDomElements.salaryMonthFilter.value;
+                const selectedYear = parseInt(allDomElements.salaryYearFilter.value);
+
+                allDomElements.salarySheetMonthYear.textContent = `${selectedMonth} ${selectedYear}`;
+                allDomElements.teacherSalaryTableBody.innerHTML = '';
+                let totalSalary = 0;
+                
+                // Filter teachers who joined by or before the selected month/year and haven't resigned by that month/year
+                const filteredTeachers = teachersInfo.filter(teacher => {
+                    const joiningDate = new Date(teacher.joining);
+                    const resignDate = teacher.resign ? new Date(teacher.resign) : null;
+                    // Create a date for the end of the selected month
+                    const filterDate = new Date(selectedYear, monthOrder.indexOf(selectedMonth) + 1, 0); // Last day of selected month
+
+                    const isJoined = joiningDate <= filterDate;
+                    const notResigned = !resignDate || resignDate > filterDate;
+
+                    return isJoined && notResigned;
+                });
+
+                filteredTeachers.forEach((teacher, index) => {
+                    const row = `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-2 border border-gray-300">${index + 1}</td>
+                            <td class="px-4 py-2 border border-gray-300">${teacher.type}</td>
+                            <td class="px-4 py-2 border border-gray-300">${teacher.name}</td>
+                            <td class="px-4 py-2 border border-gray-300">${teacher.subject}</td>
+                            <td class="px-4 py-2 border border-gray-300">$${teacher.salary.toLocaleString()}</td>
+                            <td class="px-4 py-2 border border-gray-300"></td>
+                        </tr>`;
+                    allDomElements.teacherSalaryTableBody.innerHTML += row;
+                    totalSalary += teacher.salary;
+                });
+                allDomElements.totalSalaryAmount.textContent = `$${totalSalary.toLocaleString()}`;
+
+                if (filteredTeachers.length === 0) {
+                    allDomElements.teacherSalaryTableBody.innerHTML = `<tr><td colspan="6" class="px-4 py-2 text-center text-gray-500">No teachers found for the selected month and year.</td></tr>`;
+                }
+                console.log('Teacher Salary Table Rendered.');
+            } catch (error) {
+                console.error('Error in renderTeacherSalaryTable:', error);
+                showCustomAlert('Error rendering teacher salary table: ' + error.message);
+            }
+        };
+
+        const populateDashboardYearFilter = () => {
+            console.log('Populating Dashboard Year Filter...');
+             const allYears = [...new Set([
+                 ...feePayments.map(p => p.year),
+                 ...schoolExpenses.map(e => new Date(e.date).getFullYear()),
+                 ...teachersInfo.map(t => new Date(t.joining).getFullYear())
+             ])].sort((a,b) => b-a);
+             allDomElements.dashFilterYear.innerHTML = '<option value="">All Years</option>' + allYears.map(y => `<option value="${y}">${y}</option>`).join('');
+             // Also populate salary year filter
+             allDomElements.salaryYearFilter.innerHTML = allYears.map(y => `<option value="${y}">${y}</option>`).join('');
+             allDomElements.salaryYearFilter.value = new Date().getFullYear(); // Set current year as default
+             console.log('Dashboard Year Filter Populated.');
+        };
+        
+        const updateDashboard = () => {
+            console.log('Updating Dashboard...');
+            try {
+                const { dashFilterType, dashFilterYear, dashFilterMonth, dashFilterClass, dashFilterSection } = allDomElements;
+                const reportType = dashFilterType.value;
+                
+                allDomElements.dashFilterClass.disabled = reportType === 'Expense';
+                allDomElements.dashFilterSection.disabled = reportType === 'Expense';
+                
+                let sourceData, typesToShow, grandTotalLabel, grandTotalColor;
+                if (reportType === 'Income') {
+                    const paymentsWithClass = feePayments.map(p => {
+                        if (p.studentId && typeof p.studentId === 'string' && p.studentId.startsWith('CLASS-')) {
+                            const parts = p.studentId.split('-');
+                            return {...p, class: parseInt(parts[1]), section: parts[2]};
+                        }
+                        const student = studentDetails.find(s => s.id === p.studentId);
+                        return student ? {...p, class: student.class, section: student.section} : p;
+                    });
+                    sourceData = paymentsWithClass.filter(p =>
+                        (!dashFilterYear.value || p.year == parseInt(dashFilterYear.value)) &&
+                        (!dashFilterMonth.value || (Array.isArray(p.month) ? p.month.includes(dashFilterMonth.value) : p.month == dashFilterMonth.value)) &&
+                        (!dashFilterClass.value || (p.class && p.class == parseInt(dashFilterClass.value))) &&
+                        (!dashFilterSection.value || (p.section && p.section == dashFilterSection.value))
+                    );
+                    typesToShow = allFeeTypes;
+                    grandTotalLabel = 'TOTAL INCOME';
+                    grandTotalColor = 'bg-indigo-600';
+                } else { // Expense Report
+                    sourceData = schoolExpenses.filter(e =>
+                        (!dashFilterYear.value || new Date(e.date).getFullYear() == parseInt(dashFilterYear.value)) &&
+                        (!dashFilterMonth.value || monthOrder[new Date(e.date).getMonth()] == dashFilterMonth.value)
+                    );
+                    typesToShow = expenseTypes;
+                    grandTotalLabel = 'TOTAL EXPENSE';
+                    grandTotalColor = 'bg-rose-600';
+                }
+                
+                const totals = sourceData.reduce((acc, p) => { acc[p.feeType || p.type] = (acc[p.feeType || p.type] || 0) + p.amount; return acc; }, {});
+                allDomElements.dashboardKpis.innerHTML = '';
+                let grandTotal = 0;
+                
+                typesToShow.forEach(type => {
+                    const amount = totals[type] || 0;
+                    if (amount > 0) {
+                        grandTotal += amount;
+                        allDomElements.dashboardKpis.innerHTML += `<div class="kpi-card"><h3 class="text-gray-500 font-semibold truncate">${type}</h3><p class="text-3xl font-bold text-gray-800 mt-2">$${amount.toLocaleString()}</p></div>`;
+                    }
+                });
+                
+                if (allDomElements.dashboardKpis.innerHTML === '') {
+                     allDomElements.dashboardKpis.innerHTML = `<p class="text-gray-500 col-span-full text-center">No data found for the selected filters.</p>`;
+                } else {
+                     allDomElements.dashboardKpis.insertAdjacentHTML('afterbegin', `<div class="kpi-card ${grandTotalColor} text-white"><h3 class="font-semibold truncate">${grandTotalLabel}</h3><p class="text-3xl font-bold mt-2">$${grandTotal.toLocaleString()}</p></div>`);
+                }
+                console.log('Dashboard Updated.');
+            } catch (error) {
+                console.error('Error in updateDashboard:', error);
+                showCustomAlert('Error updating dashboard: ' + error.message);
+            }
+        };
+
+        const clearDashFilters = () => {
+            console.log('Clearing Dashboard Filters...');
+            allDomElements.dashFilterYear.value = ''; allDomElements.dashFilterMonth.value = ''; allDomElements.dashFilterClass.value = '';
+            updateSectionFilter(allDomElements.dashFilterClass, allDomElements.dashFilterSection);
+            updateDashboard();
+        };
+
+        const toggleDarkMode = () => {
+            console.log('Toggling Dark Mode...');
+            const htmlElement = document.documentElement;
+            if (htmlElement.classList.contains('light')) {
+                htmlElement.classList.remove('light');
+                htmlElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                allDomElements.darkModeIcon.classList.replace('fa-moon', 'fa-sun');
+                allDomElements.darkModeText.textContent = 'Light Mode';
+            } else {
+                htmlElement.classList.remove('dark');
+                htmlElement.classList.add('light');
+                localStorage.setItem('theme', 'light');
+                allDomElements.darkModeIcon.classList.replace('fa-sun', 'fa-moon');
+                allDomElements.darkModeText.textContent = 'Dark Mode';
+            }
+        };
+
+        const applyThemeFromLocalStorage = () => {
+            console.log('Applying theme from local storage...');
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.documentElement.classList.remove('light', 'dark');
+                document.documentElement.classList.add(savedTheme);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                // If no theme saved, check system preference
+                document.documentElement.classList.remove('light');
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.add('light');
+            }
+
+            // Update toggle button text and icon based on applied theme
+            if (document.documentElement.classList.contains('dark')) {
+                allDomElements.darkModeIcon.classList.replace('fa-moon', 'fa-sun');
+                allDomElements.darkModeText.textContent = 'Light Mode';
+            } else {
+                allDomElements.darkModeIcon.classList.replace('fa-sun', 'fa-moon');
+                allDomElements.darkModeText.textContent = 'Dark Mode';
+            }
+        };
+
+        const setupEventListeners = () => {
+            console.log('Setting up event listeners...');
+            // Login Form
+            allDomElements.loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                await loginUser(email, password);
+            });
+
+            // Logout Button
+            allDomElements.logoutBtn.addEventListener('click', logoutUser);
+
+            // Sidebar navigation
+            Object.values(allDomElements.navButtons).forEach(btn => btn.addEventListener('click', (e) => switchPage(e.currentTarget.id.replace('btn-', ''))));
+            
+            // Payments
+            allDomElements.addPaymentBtn.addEventListener('click', () => openPaymentModal());
+            allDomElements.paymentModalCloseBtn.addEventListener('click', closePaymentModal);
+            allDomElements.paymentForm.addEventListener('submit', handlePaymentFormSubmit);
+            allDomElements.paymentsTableBody.addEventListener('click', (e) => {
+                if (e.target.classList.contains('edit-payment-btn')) {
+                    if (currentUser && currentUser.role === 'Accounts Officer') { // Check permission before opening
+                        openPaymentModal(e.target.dataset.id);
+                    } else {
+                        showCustomAlert('You do not have permission to edit payments.');
+                    }
+                }
+            });
+            allDomElements.filterPaymentIdInput.addEventListener('input', () => renderPaymentsTable()); // Filter on input
+            allDomElements.clearPaymentFiltersBtn.addEventListener('click', () => { allDomElements.filterPaymentIdInput.value = ''; renderPaymentsTable(); });
+            document.getElementById('student-id').addEventListener('blur', validateStudentIdInForm);
+            document.getElementById('fee-type').addEventListener('change', (e) => { togglePaymentFormFields(e.target.value); autoFillFeeAmount(e.target.value); });
+            
+            // Expenses
+            allDomElements.addExpenseBtn.addEventListener('click', () => openExpenseModal());
+            allDomElements.expenseModalCloseBtn.addEventListener('click', closeExpenseModal);
+            allDomElements.expenseForm.addEventListener('submit', handleExpenseFormSubmit);
+            allDomElements.expensesTableBody.addEventListener('click', e => {
+                if (e.target.classList.contains('edit-expense-btn')) {
+                    if (currentUser && currentUser.role === 'Accounts Officer') { // Check permission before opening
+                        openExpenseModal(e.target.dataset.id);
+                    } else {
+                        showCustomAlert('You do not have permission to edit expenses.');
+                    }
+                }
+            });
+            allDomElements.filterExpenseTextInput.addEventListener('input', () => renderExpensesTable()); // Filter on input
+            allDomElements.clearExpenseFiltersBtn.addEventListener('click', () => { allDomElements.filterExpenseTextInput.value = ''; renderExpensesTable(); });
+
+            // Students
+            allDomElements.addStudentBtn.addEventListener('click', () => openStudentModal());
+            allDomElements.studentModalCloseBtn.addEventListener('click', closeStudentModal);
+            allDomElements.studentForm.addEventListener('submit', handleStudentFormSubmit);
+            allDomElements.studentsTableBody.addEventListener('click', e => {
+                if (e.target.classList.contains('edit-student-btn')) {
+                    if (currentUser && currentUser.role === 'Accounts Officer') { // Check permission
+                        openStudentModal(e.target.dataset.id);
+                    } else {
+                        showCustomAlert('You do not have permission to edit student details.');
+                    }
+                }
+            });
+            allDomElements.studentsCardView.addEventListener('click', e => {
+                if (e.target.classList.contains('edit-student-btn')) {
+                    if (currentUser && currentUser.role === 'Accounts Officer') { // Check permission
+                        openStudentModal(e.target.dataset.id);
+                    } else {
+                        showCustomAlert('You do not have permission to edit student details.');
+                    }
+                }
+            });
+            
+            // Teachers
+            allDomElements.addTeacherBtn.addEventListener('click', () => openTeacherModal());
+            allDomElements.teacherModalCloseBtn.addEventListener('click', closeTeacherModal);
+            allDomElements.teacherForm.addEventListener('submit', handleTeacherFormSubmit);
+            allDomElements.teachersTableBody.addEventListener('click', e => {
+                if (e.target.classList.contains('edit-teacher-btn')) {
+                    if (currentUser && currentUser.role === 'Accounts Officer') { // Check permission
+                        openTeacherModal(e.target.dataset.id);
+                    } else {
+                        showCustomAlert('You do not have permission to edit teacher details.');
+                    }
+                }
+            });
+            allDomElements.teachersCardView.addEventListener('click', e => {
+                if (e.target.classList.contains('edit-teacher-btn')) {
+                    if (currentUser && currentUser.role === 'Accounts Officer') { // Check permission
+                        openTeacherModal(e.target.dataset.id);
+                    } else {
+                        showCustomAlert('You do not have permission to edit teacher details.');
+                    }
+                }
+            });
+
+            // Teacher Salary
+            allDomElements.salaryMonthFilter.addEventListener('change', renderTeacherSalaryTable);
+            allDomElements.salaryYearFilter.addEventListener('change', renderTeacherSalaryTable);
+            allDomElements.printSalaryBtn.addEventListener('click', () => window.print());
+
+            // Student Filters
+            allDomElements.filterClass.addEventListener('change', () => { updateSectionFilter(allDomElements.filterClass, allDomElements.filterSection); renderStudentsTable(); });
+            allDomElements.filterSection.addEventListener('change', renderStudentsTable);
+            allDomElements.clearStudentFiltersBtn.addEventListener('click', () => { allDomElements.filterClass.value = ''; updateSectionFilter(allDomElements.filterClass, allDomElements.filterSection); renderStudentsTable(); });
+            document.getElementById('new-student-class').addEventListener('change', (e) => updateSectionFilter(e.target, document.getElementById('new-student-section')));
+            
+            // Vehicle Filters
+            allDomElements.filterVehicleNoInput.addEventListener('input', renderVehiclesTable);
+            allDomElements.clearVehicleFiltersBtn.addEventListener('click', () => { allDomElements.filterVehicleNoInput.value = ''; renderVehiclesTable(); });
+            
+            // Dashboard Filters
+            [allDomElements.dashFilterType, allDomElements.dashFilterYear, allDomElements.dashFilterMonth, allDomElements.dashFilterClass, allDomElements.dashFilterSection].forEach(el => el.addEventListener('change', updateDashboard));
+            allDomElements.dashFilterClass.addEventListener('change', () => updateSectionFilter(allDomElements.dashFilterClass, allDomElements.dashFilterSection));
+            allDomElements.clearDashFiltersBtn.addEventListener('click', clearDashFilters);
+            const paymentClassSelect = document.getElementById('payment-class');
+            paymentClassSelect.addEventListener('change', () => updateSectionFilter(paymentClassSelect, document.getElementById('payment-section')));
+            
+            // Mobile Menu Toggle
+            allDomElements.menuToggle.addEventListener('click', () => { allDomElements.sidebar.classList.toggle('-translate-x-full'); allDomElements.modalOverlay.classList.toggle('hidden'); });
+            allDomElements.modalOverlay.addEventListener('click', () => { allDomElements.sidebar.classList.add('-translate-x-full'); allDomElements.modalOverlay.classList.add('hidden'); });
+            
+            // Dark Mode Toggle
+            allDomElements.darkModeToggle.addEventListener('click', toggleDarkMode);
+            console.log('Event listeners set up.');
+        };
+
+        const init = async () => {
+            console.log('Initializing app...');
+            applyThemeFromLocalStorage();
+
+            // Populate static dropdowns
+            document.getElementById('fee-type').innerHTML = allFeeTypes.map(f => `<option>${f}</option>`).join('');
+            document.getElementById('expense-type').innerHTML = expenseTypes.map(f => `<option>${f}</option>`).join('');
+            document.getElementById('employee-type').innerHTML = employeeTypes.map(f => `<option>${f}</option>`).join('');
+            document.getElementById('month').innerHTML = monthOrder.map(m => `<option value="${m}">${m}</option>`).join('');
+            allDomElements.dashFilterMonth.innerHTML = '<option value="">All Months</option>' + monthOrder.map(m => `<option value="${m}">${m}</option>`).join('');
+            allDomElements.salaryMonthFilter.innerHTML = monthOrder.map(m => `<option value="${m}">${m}</option>`).join('');
+            allDomElements.salaryMonthFilter.value = monthOrder[new Date().getMonth()];
+            allDomElements.newStudentAdmissionMonth.innerHTML = monthOrder.map(m => `<option value="${m}">${m}</option>`).join('');
+
+            populateClassFilter(allDomElements.filterClass, true);
+            updateSectionFilter(allDomElements.filterClass, allDomElements.filterSection);
+            populateClassFilter(allDomElements.dashFilterClass, true);
+            updateSectionFilter(allDomElements.dashFilterClass, allDomElements.dashFilterSection);
+            populateClassFilter(document.getElementById('payment-class'), false);
+            updateSectionFilter(document.getElementById('payment-class'), document.getElementById('payment-section'));
+            
+            setupEventListeners();
+
+            // Check for existing login session
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                currentUser = JSON.parse(storedUser);
+                allDomElements.currentUserEmailSpan.textContent = currentUser.email;
+                allDomElements.loginPage.classList.add('hidden');
+                allDomElements.mainAppContent.classList.remove('hidden');
+                await loadAllDataAndRenderUI();
+                applyRolePermissions();
+                // Determine initial page based on role
+                if (currentUser.role === 'Director') {
+                    switchPage('dashboard');
+                } else {
+                    switchPage('students');
+                }
+            } else {
+                // Show login page if no session
+                allDomElements.loginPage.classList.remove('hidden');
+                allDomElements.mainAppContent.classList.add('hidden');
+            }
+            console.log('App initialization complete.');
+        };
+        init();
+    });
+    </script>
+</body>
+</html>

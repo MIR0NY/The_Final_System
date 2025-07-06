@@ -1,0 +1,190 @@
+@import "tailwindcss";
+
+/* Custom styles */
+body {
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for dark mode */
+}
+
+/* Light mode default */
+html.light body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: #1f2937; /* Default text color */
+}
+html.light .bg-white { background-color: #ffffff; }
+html.light .bg-gray-50 { background-color: #f9fafb; }
+html.light .bg-gray-100 { background-color: #f3f4f6; }
+html.light .border-gray-200 { border-color: #e5e7eb; }
+html.light .border-gray-300 { border-color: #d1d5db; }
+html.light .text-gray-700 { color: #374151; }
+html.light .text-gray-800 { color: #1f2937; }
+html.light .text-gray-900 { color: #111827; }
+html.light .text-gray-500 { color: #6b7280; }
+html.light .hover\:bg-gray-50:hover { background-color: #f9fafb; }
+
+
+/* Dark mode styles */
+html.dark body {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    color: #e5e7eb; /* Light text color for dark mode */
+}
+html.dark .bg-white, html.dark .kpi-card { background-color: #1f2937; }
+html.dark .bg-gray-50 { background-color: #374151; }
+html.dark .bg-gray-100 { background-color: #1f2937; }
+html.dark .border-gray-200 { border-color: #4b5563; }
+html.dark .border-gray-300 { border-color: #4b5563; }
+html.dark .text-gray-700 { color: #d1d5db; }
+html.dark .text-gray-800 { color: #f3f4f6; }
+html.dark .text-gray-900 { color: #f9fafb; }
+html.dark .text-gray-500 { color: #9ca3af; }
+html.dark .hover\:bg-gray-50:hover { background-color: #374151; }
+html.dark input, html.dark select, html.dark textarea {
+    background-color: #374151;
+    color: #f9fafb;
+    border-color: #4b5563;
+}
+html.dark input:focus, html.dark select:focus, html.dark textarea:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+}
+html.dark .bg-indigo-50 { background-color: #4338ca; }
+html.dark .border-indigo-200 { border-color: #6366f1; }
+html.dark .bg-gray-200 { background-color: #4b5563; }
+html.dark .text-gray-800 { color: #f3f4f6; }
+html.dark .text-gray-700 { color: #d1d5db; }
+
+/* Common button styles */
+.btn-primary {
+    background-image: linear-gradient(to right, #6366f1 0%, #8b5cf6 100%);
+    transition: all 0.3s ease;
+    background-size: 200% auto;
+}
+.btn-primary:hover {
+    background-position: right center;
+    box-shadow: 0 8px 15px rgba(139, 92, 246, 0.4);
+    transform: translateY(-1px);
+}
+.btn-secondary {
+    background-image: linear-gradient(to right, #ef4444 0%, #f472b6 100%);
+    transition: all 0.3s ease;
+    background-size: 200% auto;
+}
+.btn-secondary:hover {
+    background-position: right center;
+    box-shadow: 0 8px 15px rgba(244, 114, 182, 0.4);
+    transform: translateY(-1px);
+}
+.btn-tertiary {
+     background-image: linear-gradient(to right, #6b7280 0%, #9ca3af 100%);
+    transition: all 0.3s ease;
+    background-size: 200% auto;
+}
+.btn-tertiary:hover {
+    background-position: right center;
+    box-shadow: 0 8px 15px rgba(156, 163, 175, 0.4);
+    transform: translateY(-1px);
+}
+input, select, textarea {
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #d1d5db;
+    transition: all 0.2s ease;
+}
+input:focus, select:focus, textarea:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    outline: none;
+}
+
+/* Sidebar specific styles */
+.sidebar-btn {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 20; /* Ensure button content is above pseudo-element */
+}
+html.light .sidebar-btn.active {
+    background-color: #4f46e5;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+    transform: translateY(-2px);
+}
+html.dark .sidebar-btn.active {
+    background-color: #4f46e5;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+    transform: translateY(-2px);
+}
+.sidebar-btn:hover:not(.active) {
+    background-color: #e0e7ff;
+    color: #4f46e5;
+}
+html.dark .sidebar-btn:hover:not(.active) {
+    background-color: #374151;
+    color: #a78bfa;
+}
+.sidebar-btn.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background-color: #8b5cf6;
+    border-radius: 0 5px 5px 0;
+}
+
+/* Table styles */
+.table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.table-cell-nowrap {
+    white-space: nowrap;
+}
+
+/* KPI Card styles */
+.kpi-card {
+    background-color: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #e2e8f0;
+}
+.kpi-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Modal styles */
+.modal {
+    transition: opacity 0.3s ease;
+}
+
+/* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    color: white;
+    font-size: 1.5rem;
+}
+
+
+.flex-grow-0-1 {
+    flex-grow: 1;
+    flex-shrink: 0;
+    min-height: 0; /* Important for flex items in a column layout to allow shrinking */
+}
