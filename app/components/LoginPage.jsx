@@ -14,7 +14,7 @@ export default function LoginPage({ onLogin, loginMessage }) {
 
   return (
     <section className="flex flex-col items-center justify-center h-screen w-full ">
-      <div className="bg-white p-[20px] rounded-lg shadow-xl w-1/3 max-w-md border border-gray-200">
+      <div className="bg-white sm:p-[20px] py-5 rounded-lg shadow-xl sm:w-1/3 max-w-md border w-[90vw] border-gray-200">
         <h2 className="text-3xl font-bold text-indigo-600 mb-6 text-center">School Login</h2>
         <form onSubmit={handleSubmit} className="space-y-4 w-full p-10">
           <div>

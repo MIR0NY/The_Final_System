@@ -2,9 +2,6 @@
 'use client';
 
 import React, { useState, useCallback, useRef } from 'react';
-// Removed react-window imports:
-// import { FixedSizeList as List } from 'react-window';
-// import AutoSizer from 'react-virtualized-auto-sizer';
 import { monthOrder, classData } from '@/lib/constants';
 
 export default function StudentsPage({
@@ -108,7 +105,7 @@ export default function StudentsPage({
     return matchesRoleAssignment && matchesFilter && student.status !== 'transferred';
   });
 
-  const canEditStudents = currentUser?.role === 'Accounts Officer';
+const canEditStudents = currentUser?.role === 'Admin' || currentUser?.role === 'Accountant' || currentUser?.role === 'Accounts Officer';;
 
   const openModal = (student = null) => {
     if (student) {
@@ -245,30 +242,30 @@ export default function StudentsPage({
   }, [payments]);
 
 
-  // MobileCard is now the default view for all screen sizes
   const StudentCard = useCallback(({ student }) => {
     const studentDueMonths = calculateStudentDueMonths(student, payments);
     const canEdit = currentUser?.role === 'Accounts Officer';
 
     return (
-      <div className="bg-white rounded-lg shadow-md p-4 space-y-2 border border-gray-200">
-        <div className="flex justify-between items-start">
-          <div>
-            <p className="font-bold text-lg">{student.name || 'N/A'} <span className="font-normal text-sm text-gray-500">({student.id || 'N/A'})</span></p>
-            <p className="text-sm text-gray-600">Class: {student.class || 'N/A'}-{student.section || 'N/A'} | Roll: {student.roll || 'N/A'}</p>
-            <p className="text-sm text-gray-600">Status: {student.status || 'N/A'} | Blood: {student.bloodGroup || 'N/A'}</p>
-            <p className={`text-sm font-semibold ${studentDueMonths.includes('Due') || studentDueMonths.includes(',') ? 'text-red-600' : 'text-green-600'}`}>Due: {studentDueMonths}</p>
+      // Card styling for responsive width and fixed height
+      <div className="bg-white rounded-lg shadow-md p-4 space-y-2 border border-gray-200 h-[280px] flex flex-col justify-between">
+        <div className="flex justify-between items-start flex-shrink-0">
+          <div className="flex-grow">
+            <p className="font-bold text-lg leading-tight">{student.name || 'N/A'} <span className="font-normal text-sm text-gray-500">({student.id || 'N/A'})</span></p>
+            <p className="text-sm text-gray-600 leading-tight">Class: {student.class || 'N/A'}-{student.section || 'N/A'} | Roll: {student.roll || 'N/A'}</p>
+            <p className="text-sm text-gray-600 leading-tight">Status: {student.status || 'N/A'} | Blood: {student.bloodGroup || 'N/A'}</p>
+            <p className={`text-sm font-semibold leading-tight ${studentDueMonths.includes('Due') || studentDueMonths.includes(',') ? 'text-red-600' : 'text-green-600'}`}>Due: {studentDueMonths}</p>
           </div>
           {canEdit && (
             <button
               onClick={() => openModal(student)}
-              className="edit-student-btn text-indigo-600 hover:text-indigo-900 font-medium text-sm"
+              className="edit-student-btn text-indigo-600 hover:text-indigo-900 font-medium text-sm ml-2 flex-shrink-0"
             >
               Edit
             </button>
           )}
         </div>
-        <div className="border-t pt-2 space-y-1 text-sm">
+        <div className="border-t pt-2 space-y-1 text-sm overflow-hidden flex-grow"> {/* flex-grow to fill remaining height */}
           <p><strong className="font-medium">Address:</strong> {student.address || 'N/A'}</p>
           <p><strong className="font-medium">Tuition Last Paid:</strong> {findLastPaidMonth(student.id, 'TUITION FEE')} (${calculateTotal(student.id, 'TUITION FEE').toLocaleString()})</p>
           <p><strong className="font-medium">Vehicle Last Paid:</strong> {findLastPaidMonth(student.id, 'VEHICLE FEE')} (${calculateTotal(student.id, 'VEHICLE FEE').toLocaleString()})</p>
@@ -301,8 +298,8 @@ export default function StudentsPage({
           </button>
         )}
       </div>
-      <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 flex flex-col flex-grow min-h-0">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 flex-shrink-0">
+      <div className="bg-white p-6 rounded-xl  shadow-lg border border-gray-200 flex flex-col flex-grow min-h-0">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 flex-shrink-0">
           <select
             id="filter-class"
             className="w-full p-2 border border-gray-300 rounded-lg"
@@ -327,14 +324,17 @@ export default function StudentsPage({
           </select>
           <button
             onClick={() => { setFilterClass(''); setFilterSection(''); }}
-            className={`btn-tertiary text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-gray-700 transition duration-300 col-span-1 md:col-start-4 ${currentUser?.role === 'Class Teacher' ? 'hidden' : ''}`}
+            className={`btn-tertiary text-white col-span-2 font-bold py-2 px-4 rounded-lg shadow-md hover:bg-gray-700 transition duration-300 sm:col-span-1 md:col-start-4 ${currentUser?.role === 'Class Teacher' ? 'hidden' : ''}`}
           >
             Clear Filters
           </button>
         </div>
-        {/* Card View for all screen sizes */}
         {filteredStudents.length > 0 ? (
-          <div id="students-card-view" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-grow overflow-y-auto"> {/* Added flex-grow overflow-y-auto for card container */}
+          <div
+            id="students-card-view"
+            // Using auto-fit for responsive columns with minmax width
+            className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4 flex-grow overflow-y-auto container"
+          >
             {filteredStudents.map(student => (
               <StudentCard key={student.id} student={student} />
             ))}
@@ -412,7 +412,6 @@ export default function StudentsPage({
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                     value={formState.section}
                     onChange={handleFormChange}
-                    required
                   >
                     <option value="">Select Section</option>
                     {populateSectionDropdown(formState.class)}
