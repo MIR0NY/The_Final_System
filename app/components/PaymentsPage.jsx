@@ -35,10 +35,10 @@ export default function PaymentsPage({
     paymentClass: '',
     paymentSection: '',
     paymentSectors: [{ id: generateUniqueId(), feeType: allFeeTypes[0], month: [], amount: '', description: '' }],
-    feeType: allFeeTypes[0],
-    month: [],
-    amount: '',
-    description: '',
+    feeType: allFeeTypes[0], // For class payments, this will be used directly (single sector implied)
+    month: [], // For class payments, this will be used directly (single sector implied)
+    amount: '', // For class payments, this will be used directly (single sector implied)
+    description: '', // For class payments, this will be used directly (single sector implied)
   });
   const [studentInfo, setStudentInfo] = useState(null);
 
@@ -54,6 +54,7 @@ export default function PaymentsPage({
   const openModal = useCallback((payment = null, prefillStudentId = null) => {
     if (payment) {
       setEditPaymentId(payment.id);
+      // Determine payment mode based on studentId format
       const mode = payment.studentId && payment.studentId.startsWith('CLASS-') ? 'class' : 'student';
 
       setFormState({
@@ -64,13 +65,15 @@ export default function PaymentsPage({
         studentId: mode === 'student' ? (payment.studentId || '') : '',
         paymentClass: mode === 'class' ? (parseInt(payment.studentId.split('-')[1]) || '') : '',
         paymentSection: mode === 'class' ? (payment.studentId.split('-')[2] || '') : '',
+        // When editing, load the single payment into the first sector
         paymentSectors: [{
-          id: generateUniqueId(),
+          id: generateUniqueId(), // New ID for the sector in the form
           feeType: payment.feeType || allFeeTypes[0],
           month: Array.isArray(payment.month) ? payment.month : (payment.month ? [payment.month] : []),
           amount: payment.amount || '',
           description: payment.description || '',
         }],
+        // Also set for class mode for direct use
         feeType: payment.feeType || allFeeTypes[0],
         month: Array.isArray(payment.month) ? payment.month : (payment.month ? [payment.month] : []),
         amount: payment.amount || '',
@@ -92,7 +95,7 @@ export default function PaymentsPage({
         setStudentInfo(null);
       }
     } else {
-      // New payment
+      // Initialize for new payment
       setEditPaymentId(null);
       const initialStudentId = prefillStudentId || '';
       setFormState(prev => ({
@@ -122,14 +125,9 @@ export default function PaymentsPage({
             roll: student.roll,
           });
           // Auto-fill tuition/vehicle fee for the first sector if applicable
-          if (formState.paymentSectors.length > 0) { // Check if sectors exist
-            const firstSector = formState.paymentSectors[0];
-            if (firstSector.feeType === 'TUITION FEE') {
-              handleSectorChange(firstSector.id, 'amount', student.tuitionFee || '');
-            } else if (firstSector.feeType === 'VEHICLE FEE') {
-              handleSectorChange(firstSector.id, 'amount', student.vehicleFee || '');
-            }
-          }
+          // This part needs to be careful as formState.paymentSectors might not be updated immediately
+          // after setFormState. For now, we'll rely on the blur event or manual selection.
+          // A more robust solution might involve a useEffect for initialStudentId.
         } else {
           showCustomAlert('Student ID not found for pre-fill.', true);
           setStudentInfo(null);
@@ -172,12 +170,14 @@ export default function PaymentsPage({
 
     if (name === 'paymentMode') {
       setFormState(prev => ({ ...prev, [name]: value }));
+      // Reset student/class specific fields when mode changes
       if (value === 'student') {
         setFormState(prev => ({
           ...prev,
           paymentMode: value,
           paymentClass: '',
           paymentSection: '',
+          // Ensure at least one sector for student mode
           paymentSectors: prev.paymentSectors.length > 0 ? prev.paymentSectors : [{ id: generateUniqueId(), feeType: allFeeTypes[0], month: [], amount: '', description: '' }],
         }));
       } else { // class mode
@@ -185,7 +185,7 @@ export default function PaymentsPage({
           ...prev,
           paymentMode: value,
           studentId: '',
-          paymentSectors: [],
+          paymentSectors: [], // Clear sectors for class mode
         }));
         setStudentInfo(null);
       }
@@ -193,6 +193,7 @@ export default function PaymentsPage({
       setFormState(prev => ({
         ...prev,
         [name]: type === 'number' ? (value === '' ? '' : parseFloat(value)) : value,
+        // Handle select-multiple for top-level month (for class payments)
         ...(type === 'select-multiple' && name === 'month' && { [name]: Array.from(selectedOptions).map(option => option.value) }),
       }));
     }
@@ -240,6 +241,7 @@ export default function PaymentsPage({
         section: student.section,
         roll: student.roll,
       });
+      // Auto-fill tuition/vehicle fee for the first sector if applicable
       if (formState.paymentSectors.length > 0) {
         const firstSector = formState.paymentSectors[0];
         if (firstSector.feeType === 'TUITION FEE') {
@@ -256,8 +258,9 @@ export default function PaymentsPage({
 
   const handleSectorFeeTypeChange = (sectorId, newFeeType) => {
     handleSectorChange(sectorId, 'feeType', newFeeType);
-    handleSectorChange(sectorId, 'amount', '');
+    handleSectorChange(sectorId, 'amount', ''); // Clear amount when fee type changes
 
+    // Auto-fill amount if studentId is present and fee type is tuition/vehicle
     if (studentFeeTypes.includes(newFeeType) && formState.studentId) {
       const student = students.find(s => s.id && s.id.toLowerCase() === formState.studentId.toLowerCase());
       if (student) {
@@ -291,7 +294,7 @@ export default function PaymentsPage({
       if (!student) { showCustomAlert('Student with this ID not found.', true); return; }
 
       for (const sector of formState.paymentSectors) {
-        if (!sector.feeType || !sector.amount) {
+        if (!sector.feeType || sector.amount === '' || sector.amount === null || isNaN(sector.amount)) { // Check for empty, null, or NaN amount
           showCustomAlert('Fee Type and Amount are required for all payment sectors.', true);
           return;
         }
@@ -319,7 +322,7 @@ export default function PaymentsPage({
             allPaymentsSuccessful = false;
             const errorData = await apiResponse.json();
             errorMessage = `Failed to save payment for ${sector.feeType}: ${errorData.error || apiResponse.statusText}`;
-            break;
+            break; // Stop on first error
           }
         } else {
           for (const month of sector.month) {
@@ -332,7 +335,7 @@ export default function PaymentsPage({
               allPaymentsSuccessful = false;
               const errorData = await apiResponse.json();
               errorMessage = `Failed to save payment for ${sector.feeType} (${month}): ${errorData.error || apiResponse.statusText}`;
-              break;
+              break; // Stop on first error
             }
           }
           if (!allPaymentsSuccessful) break;
@@ -342,7 +345,9 @@ export default function PaymentsPage({
     } else { // Class Payment Mode
       if (!formState.paymentClass || !formState.paymentSection) { showCustomAlert('Class and Section are required.', true); return; }
       if (!formState.receiptNo) { showCustomAlert('Receipt No. is required.', true); return; }
-      if (!formState.feeType || !formState.amount) { showCustomAlert('Fee Type and Amount are required.', true); return; }
+      if (formState.amount === '' || formState.amount === null || isNaN(formState.amount)) { // Check for empty, null, or NaN amount
+        showCustomAlert('Fee Type and Amount are required.', true); return;
+      }
       if (classFeeTypes.includes(formState.feeType) && formState.month.length === 0 && !['ADMISSION', 'RE-ADMISSION', 'HALF YEARLY EXAM', 'YEARLY EXAM'].includes(formState.feeType)) { showCustomAlert('Please select at least one month for class payment.', true); return; }
 
       const payload = {
@@ -413,6 +418,7 @@ export default function PaymentsPage({
           </button>
         )}
       </div>
+      {/* Main content area, now flex-grow to fill available height */}
       <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 flex flex-col flex-grow min-h-0">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 flex-shrink-0">
           <input
@@ -429,9 +435,10 @@ export default function PaymentsPage({
             Clear Filter
           </button>
         </div>
-        <div className="flex-grow min-h-0 overflow-auto">
+        {/* Table Container - handles horizontal scrolling for the entire table */}
+        <div className="flex-grow min-h-0 overflow-auto"> {/* Changed to overflow-auto for both x and y if needed */}
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 sticky top-0 z-10">
+            <thead className="bg-gray-50 sticky top-0 z-10"> {/* sticky top-0 for fixed header on scroll */}
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%] whitespace-nowrap">Receipt No</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%] whitespace-nowrap">Date</th>
@@ -498,7 +505,7 @@ export default function PaymentsPage({
                       checked={formState.paymentMode === 'student'}
                       onChange={handleFormChange}
                       className="form-radio h-4 w-4 text-indigo-600"
-                      disabled={!!editPaymentId}
+                      disabled={!!editPaymentId} // Disable mode change when editing
                     />
                     <span className="ml-2 text-gray-700">Student Payment</span>
                   </label>
@@ -510,7 +517,7 @@ export default function PaymentsPage({
                       checked={formState.paymentMode === 'class'}
                       onChange={handleFormChange}
                       className="form-radio h-4 w-4 text-indigo-600"
-                      disabled={!!editPaymentId}
+                      disabled={!!editPaymentId} // Disable mode change when editing
                     />
                     <span className="ml-2 text-gray-700">Class Payment</span>
                   </label>
@@ -529,7 +536,7 @@ export default function PaymentsPage({
                     value={formState.receiptNo}
                     onChange={handleFormChange}
                     required
-                    disabled={!!editPaymentId}
+                    disabled={!!editPaymentId} // Disable editing receiptNo
                   />
                 </div>
                 <div>
@@ -573,7 +580,7 @@ export default function PaymentsPage({
                       onChange={handleFormChange}
                       onBlur={handleStudentIdBlur}
                       required
-                      disabled={!!editPaymentId}
+                      disabled={!!editPaymentId} // Disable editing studentId
                     />
                   </div>
                   {studentInfo && (
